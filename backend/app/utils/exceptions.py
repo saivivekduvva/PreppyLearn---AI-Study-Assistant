@@ -16,3 +16,7 @@ class PDFExtractionException(HTTPException):
     def __init__(self, detail: str = "An error occurred while extracting text from the PDF."):
         super().__init__(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=detail)
 
+class EmbeddingGenerationException(HTTPException):
+    def __init__(self, detail: str = "An error occurred while generating embeddings."):
+        super().__init__(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=detail)
+

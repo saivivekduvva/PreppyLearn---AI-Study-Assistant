@@ -92,4 +92,21 @@ export const generateSemanticChunks = async (text, chunkSize = 1000, chunkOverla
   }
 };
 
+/**
+ * Generates vector embeddings for a list of semantic chunks.
+ * @param {Array<string>} chunks - List of text chunks.
+ * @returns {Promise<Object>} The API response with embeddings.
+ */
+export const generateEmbeddings = async (chunks) => {
+  try {
+    const response = await apiClient.post('/rag/embed', { chunks });
+    return response.data;
+  } catch (error) {
+    console.error("Error generating embeddings:", error);
+    const errorMessage = error.response?.data?.detail || "Failed to generate embeddings.";
+    throw new Error(errorMessage);
+  }
+};
+
+
 
