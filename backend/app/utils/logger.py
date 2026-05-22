@@ -1,0 +1,28 @@
+"""
+Utilities Layer
+---------------
+Helper functions, custom exceptions, logging setup, and common tools 
+used across the application.
+"""
+import logging
+import sys
+
+def setup_logger(name: str = "app_logger") -> logging.Logger:
+    """
+    Sets up and returns a basic logger.
+    """
+    logger = logging.getLogger(name)
+    
+    if not logger.handlers:
+        logger.setLevel(logging.INFO)
+        handler = logging.StreamHandler(sys.stdout)
+        handler.setLevel(logging.INFO)
+        formatter = logging.Formatter(
+            '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        )
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        
+    return logger
+
+logger = setup_logger()
