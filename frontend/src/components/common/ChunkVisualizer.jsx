@@ -38,23 +38,23 @@ const ChunkVisualizer = ({ text, onComplete }) => {
 
   if (loading) {
     return (
-      <div className="w-full p-8 border border-slate-200 rounded-2xl bg-white shadow-xl flex flex-col items-center justify-center min-h-[300px]">
+      <div className="w-full p-10 premium-card flex flex-col items-center justify-center min-h-[300px]">
         <Loader2 className="w-8 h-8 text-indigo-500 animate-spin mb-4" />
-        <p className="text-slate-700 font-medium">Running Semantic Chunker...</p>
-        <p className="text-sm text-slate-400 mt-2">Splitting document into context-aware chunks for Vector Database</p>
+        <p className="text-slate-800 font-semibold text-lg">Running Semantic Chunker...</p>
+        <p className="text-sm text-slate-500 mt-2">Splitting document into context-aware chunks for Vector Database</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="w-full p-8 border border-red-200 rounded-2xl bg-red-50 shadow-xl flex flex-col items-center justify-center min-h-[300px]">
+      <div className="w-full p-10 premium-card flex flex-col items-center justify-center min-h-[300px] border-red-200 bg-red-50/50">
         <AlertCircle className="w-8 h-8 text-red-500 mb-4" />
-        <p className="text-red-700 font-semibold mb-2">Chunking Failed</p>
-        <p className="text-red-500 text-sm mb-4">{error}</p>
+        <p className="text-red-700 font-bold text-lg mb-2">Chunking Failed</p>
+        <p className="text-red-600 text-sm mb-6">{error}</p>
         <button 
           onClick={processText}
-          className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors"
+          className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-semibold transition-colors shadow-sm"
         >
           Try Again
         </button>
@@ -64,62 +64,63 @@ const ChunkVisualizer = ({ text, onComplete }) => {
 
   return (
     <>
-    <div className="w-full border border-slate-200 rounded-2xl bg-white shadow-xl overflow-hidden flex flex-col transform transition-all hover:shadow-2xl">
-      <div className="px-6 py-4 bg-slate-900 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Layers className="w-5 h-5 text-indigo-400" />
-          <h4 className="font-semibold text-white">Semantic Chunks</h4>
+    <div className="w-full premium-card overflow-hidden flex flex-col mt-2">
+      <div className="px-8 py-6 bg-white flex flex-col sm:flex-row items-center justify-between border-b border-neutral-200">
+        <div className="flex items-center gap-3">
+          <div className="p-3 bg-neutral-100 text-neutral-800 rounded-xl">
+            <Layers className="w-6 h-6" />
+          </div>
+          <h4 className="font-bold text-xl text-neutral-900 tracking-tight">Semantic Chunks</h4>
         </div>
-        <div className="flex items-center gap-4 text-xs font-medium text-slate-300">
-          <span className="bg-indigo-500/20 text-indigo-200 px-3 py-1 rounded-full border border-indigo-500/30">
+        <div className="flex items-center gap-4 text-sm font-semibold text-neutral-600 mt-4 sm:mt-0">
+          <span className="bg-neutral-100 text-neutral-800 px-4 py-2 rounded-xl">
             {chunks.length} Chunks Generated
           </span>
-          <div className="h-4 w-px bg-slate-700"></div>
+          <div className="h-5 w-px bg-neutral-200"></div>
           <span>Size: {chunkSize}</span>
           <span>Overlap: {chunkOverlap}</span>
         </div>
       </div>
       
-      <div className="p-5 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4">
-        <p className="text-sm text-slate-600">
-          These cohesive chunks are ready to be converted into <strong className="text-slate-800">Vector Embeddings</strong>. The overlap ensures context isn't lost between boundaries.
+      <div className="px-8 py-6 bg-neutral-50 border-b border-neutral-200 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <p className="text-base text-neutral-600 leading-relaxed max-w-2xl text-left">
+          These cohesive chunks are ready to be converted into <strong className="text-neutral-900">Vector Embeddings</strong>. The overlap ensures context isn't lost between boundaries.
         </p>
-        <div className="flex gap-2">
+        <div className="flex gap-3">
           <button 
             onClick={processText}
-            className="text-xs font-bold px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors shadow-sm whitespace-nowrap"
+            className="text-sm font-semibold px-5 py-2.5 bg-white text-neutral-900 rounded-xl hover:bg-neutral-50 transition-colors border border-neutral-200 shadow-sm whitespace-nowrap"
           >
-            Re-Process Chunks
+            Re-Process
           </button>
           {!showDebugger && chunks.length > 0 && (
             <button 
               onClick={() => setShowDebugger(true)}
-              className="text-xs font-bold px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors shadow-sm whitespace-nowrap flex items-center gap-1.5"
+              className="premium-btn flex items-center gap-2 bg-neutral-900 hover:bg-black text-white"
             >
-              <Database className="w-3.5 h-3.5" />
+              <Database className="w-4 h-4" />
               Generate Vectors
             </button>
           )}
         </div>
       </div>
 
-      <div className="p-6 h-[500px] overflow-y-auto bg-slate-100 custom-scrollbar flex flex-col gap-5 shadow-inner">
+      <div className="p-8 h-[450px] overflow-y-auto bg-white custom-scrollbar flex flex-col gap-6 text-left">
         {chunks.map((chunk, index) => (
-          <div key={index} className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm relative group hover:shadow-md transition-shadow">
-            {/* Visual Indicator for Chunk */}
-            <div className="absolute top-0 left-0 w-1.5 h-full bg-indigo-400 rounded-l-xl opacity-70 group-hover:opacity-100 transition-opacity"></div>
+          <div key={index} className="bg-neutral-50 rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+            <div className="absolute top-0 left-0 w-1.5 h-full bg-neutral-800 rounded-l-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
             
-            <div className="flex justify-between items-center mb-4">
-              <span className="text-xs font-bold text-indigo-600 uppercase tracking-wider bg-indigo-50 px-2 py-1 rounded">
+            <div className="flex justify-between items-center mb-6">
+              <span className="text-xs font-bold text-neutral-800 uppercase tracking-widest bg-neutral-200/50 px-3 py-1.5 rounded-lg">
                 Chunk {index + 1}
               </span>
-              <span className="text-xs text-slate-400 flex items-center gap-1.5 bg-slate-50 px-2 py-1 rounded border border-slate-100">
-                <Maximize2 className="w-3 h-3" />
+              <span className="text-xs font-semibold text-neutral-500 flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-neutral-200">
+                <Maximize2 className="w-3.5 h-3.5" />
                 {metadata[index]?.length || chunk.length} chars
               </span>
             </div>
             
-            <p className="text-sm text-slate-700 leading-relaxed font-serif">
+            <p className="text-base text-neutral-800 leading-relaxed font-sans">
               {chunk}
             </p>
           </div>

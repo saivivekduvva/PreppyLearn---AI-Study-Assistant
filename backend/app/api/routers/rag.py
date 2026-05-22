@@ -90,3 +90,45 @@ async def generate_embeddings(
     except Exception as e:
         logger.error(f"Embedding endpoint failed: {str(e)}")
         raise HTTPException(status_code=500, detail="An error occurred while generating embeddings.")
+
+from app.rag.retriever import RAGRetriever
+
+class RetrievalTestRequest(BaseModel):
+    query: str = Field(..., description="The user query to test retrieval against.")
+    top_k: int = Field(5, description="Number of top chunks to retrieve.")
+
+@router.post("/test-retrieval")
+async def test_retrieval(request: RetrievalTestRequest):
+    """
+    Developer Utility: Test retrieval quality in the RAG pipeline.
+    Displays retrieved chunks, their similarity scores, and the formulated prompt.
+    Useful for debugging retrieval relevance.
+    """
+    if not request.query.strip():
+        raise HTTPException(status_code=400, detail="Query cannot be empty.")
+        
+    try:
+        retriever = RAGRetriever()
+        
+        # Get context and debug chunks
+        context, retrieved_chunks = retriever.retrieve_context(
+            query=request.query, 
+            top_k=request.top_k
+        )
+        
+        # Build the theoretical prompt
+        prompt = retriever.build_prompt(request.query, context)
+        
+        return {
+            "status": "success",
+            "message": "Retrieval test completed.",
+            "data": {
+                "query": request.query,
+                "retrieved_chunks_count": len(retrieved_chunks),
+                "chunks": retrieved_chunks,
+                "generated_prompt": prompt
+            }
+        }
+    except Exception as e:
+        logger.error(f"Retrieval testing failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"An error occurred during retrieval test: {str(e)}")

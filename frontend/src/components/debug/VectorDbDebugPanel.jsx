@@ -70,24 +70,24 @@ const VectorDbDebugPanel = () => {
   };
 
   return (
-    <div className="glass-panel" style={{ padding: '1.5rem', marginTop: '2rem', textAlign: 'left', border: '1px solid #334155', background: 'rgba(15, 23, 42, 0.6)', borderRadius: '12px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <h3 style={{ fontSize: '1.25rem', color: '#e2e8f0', margin: 0, fontWeight: '600' }}>
-          <span style={{ marginRight: '8px' }}>🔍</span> Vector DB Debug Panel
+    <div className="w-full premium-card overflow-hidden flex flex-col mt-4">
+      <div className="px-8 py-6 bg-white flex flex-col sm:flex-row items-center justify-between border-b border-neutral-200">
+        <h3 className="text-xl font-bold text-neutral-900 tracking-tight flex items-center gap-3">
+          <span className="p-3 bg-neutral-100 rounded-xl text-neutral-800">🔍</span> Vector DB Debug Panel
         </h3>
         
-        <div style={{ background: '#1e293b', padding: '0.5rem 1rem', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem' }}>
-          <span style={{ color: '#94a3b8' }}>Stored Chunks:</span>
+        <div className="flex items-center gap-3 mt-4 sm:mt-0 bg-neutral-50 px-5 py-2.5 rounded-xl border border-neutral-200 text-sm font-semibold">
+          <span className="text-neutral-500 tracking-wide">Stored Chunks:</span>
           {loadingCount ? (
-            <span style={{ color: '#fbbf24' }}>Loading...</span>
+            <span className="text-neutral-900">Loading...</span>
           ) : countError ? (
-            <span style={{ color: '#f87171' }} title={countError}>Error</span>
+            <span className="text-red-500" title={countError}>Error</span>
           ) : (
-            <span style={{ color: '#10b981', fontWeight: 'bold' }}>{count !== null ? count : 'N/A'}</span>
+            <span className="text-neutral-900">{count !== null ? count : 'N/A'}</span>
           )}
           <button 
             onClick={fetchCount}
-            style={{ background: 'transparent', border: 'none', color: '#60a5fa', cursor: 'pointer', padding: '0 4px' }}
+            className="text-neutral-900 hover:text-neutral-500 transition-colors ml-2 font-bold text-lg"
             title="Refresh Count"
           >
             ↻
@@ -95,79 +95,61 @@ const VectorDbDebugPanel = () => {
         </div>
       </div>
 
-      <form onSubmit={handleSearch} style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.5rem' }}>
-        <input 
-          type="text" 
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Test similarity search... (e.g. 'What is machine learning?')"
-          style={{ 
-            flex: 1, 
-            padding: '0.75rem 1rem', 
-            borderRadius: '8px', 
-            border: '1px solid #334155', 
-            background: '#0f172a',
-            color: '#f8fafc',
-            outline: 'none',
-            fontSize: '0.95rem'
-          }}
-        />
-        <button 
-          type="submit" 
-          disabled={loadingSearch || !searchQuery.trim()}
-          style={{
-            padding: '0 1.5rem',
-            background: loadingSearch || !searchQuery.trim() ? '#334155' : '#3b82f6',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: loadingSearch || !searchQuery.trim() ? 'not-allowed' : 'pointer',
-            fontWeight: '600',
-            transition: 'background 0.2s'
-          }}
-        >
-          {loadingSearch ? 'Searching...' : 'Search'}
-        </button>
-      </form>
+      <div className="px-8 py-6 bg-neutral-50 border-b border-neutral-200">
+        <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-4">
+          <input 
+            type="text" 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Test similarity search... (e.g. 'What is machine learning?')"
+            className="flex-1 px-5 py-3 rounded-xl border border-neutral-200 bg-white text-neutral-900 outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 transition-all shadow-sm"
+          />
+          <button 
+            type="submit" 
+            disabled={loadingSearch || !searchQuery.trim()}
+            className="premium-btn whitespace-nowrap bg-neutral-900 hover:bg-black text-white"
+          >
+            {loadingSearch ? 'Searching...' : 'Search Vectors'}
+          </button>
+        </form>
+      </div>
 
-      {searchError && (
-        <div style={{ padding: '1rem', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '8px', color: '#fca5a5', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
-          ⚠️ {searchError}
-        </div>
-      )}
+      <div className="p-8 h-[450px] overflow-y-auto bg-white custom-scrollbar flex flex-col gap-6 text-left">
+        {searchError && (
+          <div className="p-5 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm font-semibold">
+            ⚠️ {searchError}
+          </div>
+        )}
 
-      {searchResults && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <h4 style={{ color: '#94a3b8', fontSize: '0.9rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            Results ({searchResults.length})
-          </h4>
-          
-          {searchResults.length === 0 ? (
-            <p style={{ color: '#64748b', fontSize: '0.95rem', fontStyle: 'italic' }}>No similar chunks found.</p>
-          ) : (
-            searchResults.map((result, idx) => (
-              <div key={result.id || idx} style={{ background: '#1e293b', padding: '1rem', borderRadius: '8px', borderLeft: '4px solid #3b82f6' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
-                  <span style={{ fontSize: '0.75rem', color: '#64748b', fontFamily: 'monospace' }}>ID: {result.id}</span>
-                  <span style={{ 
-                    fontSize: '0.75rem', 
-                    padding: '0.2rem 0.5rem', 
-                    background: 'rgba(16, 185, 129, 0.1)', 
-                    color: '#34d399', 
-                    borderRadius: '4px',
-                    fontWeight: 'bold'
-                  }}>
-                    Score: {result.similarity_score !== null ? result.similarity_score.toFixed(4) : 'N/A'}
-                  </span>
+        {searchResults && (
+          <div className="flex flex-col gap-6 w-full">
+            <h4 className="text-xs font-bold text-neutral-500 uppercase tracking-widest pl-1">
+              Results ({searchResults.length})
+            </h4>
+            
+            {searchResults.length === 0 ? (
+              <p className="text-neutral-500 italic pl-1">No similar chunks found.</p>
+            ) : (
+              searchResults.map((result, idx) => (
+                <div key={result.id || idx} className="bg-neutral-50 rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+                  <div className="absolute top-0 left-0 w-1.5 h-full bg-neutral-800 rounded-l-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <div className="flex justify-between items-center mb-6">
+                    <span className="text-xs font-semibold text-neutral-500 font-mono bg-white px-3 py-1.5 rounded-lg border border-neutral-200">
+                      ID: {result.id}
+                    </span>
+                    <span className="text-xs font-bold px-3 py-1.5 bg-neutral-200/50 text-neutral-900 rounded-lg">
+                      Score: {result.similarity_score !== null ? result.similarity_score.toFixed(4) : 'N/A'}
+                    </span>
+                  </div>
+                  <p className="text-base text-neutral-900 leading-relaxed font-sans">
+                    {result.document}
+                  </p>
                 </div>
-                <p style={{ margin: 0, fontSize: '0.95rem', color: '#cbd5e1', lineHeight: '1.5' }}>
-                  {result.document}
-                </p>
-              </div>
-            ))
-          )}
-        </div>
-      )}
+              ))
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

@@ -72,14 +72,14 @@ const PdfUploader = ({ onUploadSuccess }) => {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto">
+    <div className="w-full">
       <div 
-        className={`relative flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-xl transition-all duration-300 ${
-          dragActive ? 'border-sky-500 bg-sky-50 shadow-md' : 
-          status === 'success' ? 'border-teal-500 bg-teal-50' :
-          status === 'error' ? 'border-red-400 bg-red-50' :
-          'border-slate-300 hover:border-sky-400 hover:bg-slate-50'
-        } bg-white shadow-sm`}
+        className={`relative flex flex-col items-center justify-center p-16 rounded-3xl transition-all duration-500 ${
+          dragActive ? 'bg-white shadow-2xl scale-[1.02]' : 
+          status === 'success' ? 'bg-green-50/50' :
+          status === 'error' ? 'bg-red-50/50' :
+          'bg-white shadow-xl hover:shadow-2xl'
+        }`}
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
         onDragOver={handleDrag}
@@ -97,13 +97,13 @@ const PdfUploader = ({ onUploadSuccess }) => {
 
         {status === 'idle' && (
           <div className="text-center cursor-pointer">
-            <div className="flex justify-center mb-4">
-              <div className="p-4 bg-sky-100 text-sky-600 rounded-full">
-                <UploadCloud size={32} />
+            <div className="flex justify-center mb-8">
+              <div className="p-6 bg-neutral-100 text-neutral-800 rounded-3xl">
+                <UploadCloud size={48} strokeWidth={1.5} />
               </div>
             </div>
-            <h3 className="text-lg font-semibold text-slate-800 mb-1">Upload PDF Document</h3>
-            <p className="text-sm text-slate-500">Drag & drop your file here, or click to browse</p>
+            <h3 className="text-2xl font-bold text-neutral-900 mb-3">Upload PDF Document</h3>
+            <p className="text-lg text-neutral-500">Drag & drop your file here, or click to browse</p>
           </div>
         )}
 

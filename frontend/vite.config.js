@@ -6,3 +6,4 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [react(), tailwindcss()],
 })
+// Restarting Vite server to ensure Tailwind v4 catches up with classes

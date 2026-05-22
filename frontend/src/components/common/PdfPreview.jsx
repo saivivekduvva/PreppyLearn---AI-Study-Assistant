@@ -43,59 +43,61 @@ const PdfPreview = ({ filename }) => {
 
   if (loading) {
     return (
-      <div className="w-full p-8 border border-slate-200 rounded-xl bg-slate-50 flex flex-col items-center justify-center animate-pulse min-h-[300px]">
-        <Loader2 className="w-8 h-8 text-sky-500 animate-spin mb-4" />
-        <p className="text-slate-500 font-medium">Extracting text from document...</p>
-        <p className="text-sm text-slate-400 mt-2">This might take a few seconds for larger PDFs.</p>
+      <div className="w-full p-10 premium-card flex flex-col items-center justify-center animate-pulse min-h-[300px]">
+        <Loader2 className="w-8 h-8 text-blue-500 animate-spin mb-4" />
+        <p className="text-slate-700 font-medium text-lg">Extracting text from document...</p>
+        <p className="text-sm text-slate-500 mt-2">This might take a few seconds for larger PDFs.</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="w-full p-8 border border-red-200 rounded-xl bg-red-50 flex flex-col items-center justify-center min-h-[300px]">
+      <div className="w-full p-10 premium-card flex flex-col items-center justify-center min-h-[300px]">
         <AlertCircle className="w-8 h-8 text-red-500 mb-4" />
-        <p className="text-red-700 font-semibold mb-2">Extraction Failed</p>
-        <p className="text-red-500 text-sm">{error}</p>
+        <p className="text-red-700 font-bold text-lg mb-2">Extraction Failed</p>
+        <p className="text-red-600 text-sm">{error}</p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-10">
-      <div className="w-full border border-slate-200 rounded-2xl bg-white shadow-xl overflow-hidden flex flex-col transform transition-all hover:shadow-2xl">
-        <div className="px-6 py-4 bg-slate-50 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <FileText className="w-5 h-5 text-sky-500" />
-            <h4 className="font-semibold text-slate-700">Document Preview</h4>
-          </div>
+    <div className="flex flex-col gap-6 w-full">
+      <div className="w-full premium-card overflow-hidden flex flex-col">
+        <div className="px-8 py-6 bg-white flex flex-col sm:flex-row items-center justify-between border-b border-neutral-200">
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500 bg-slate-200/50 px-3 py-1.5 rounded-full border border-slate-200">
-              <FileDigit className="w-3.5 h-3.5" />
+            <div className="p-3 bg-neutral-100 text-neutral-800 rounded-xl">
+              <FileText className="w-6 h-6" />
+            </div>
+            <h4 className="font-bold text-xl text-neutral-900 tracking-tight">Document Preview</h4>
+          </div>
+          <div className="flex items-center gap-4 mt-4 sm:mt-0">
+            <div className="flex items-center gap-1.5 text-sm font-semibold text-neutral-600 bg-neutral-100 px-4 py-2 rounded-xl">
+              <FileDigit className="w-4 h-4" />
               {stats.length.toLocaleString()} chars
             </div>
             
             {text && !showChunker && (
               <button 
                 onClick={() => setShowChunker(true)}
-                className="text-xs font-bold px-4 py-1.5 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-colors shadow-sm flex items-center gap-1.5"
+                className="premium-btn flex items-center gap-2"
               >
-                <Layers className="w-3.5 h-3.5" />
+                <Layers className="w-4 h-4" />
                 Chunk for AI
               </button>
             )}
           </div>
         </div>
       
-      <div className="p-8 h-[500px] overflow-y-auto bg-white custom-scrollbar text-left border-t border-slate-100 shadow-inner">
+      <div className="p-8 h-[450px] overflow-y-auto bg-white custom-scrollbar text-left">
         {text ? (
           <div className="prose prose-slate max-w-none">
-            <pre className="text-sm md:text-base text-slate-700 whitespace-pre-wrap font-sans leading-relaxed bg-transparent p-0 border-none m-0">
+            <pre className="text-base text-neutral-800 whitespace-pre-wrap font-sans leading-relaxed bg-transparent p-0 border-none m-0">
               {text}
             </pre>
           </div>
         ) : (
-          <div className="h-full flex items-center justify-center text-slate-400 italic text-center">
+          <div className="h-full flex items-center justify-center text-neutral-500 italic text-center text-lg">
             No text could be extracted from this document. It might be an image-only PDF.
           </div>
         )}
