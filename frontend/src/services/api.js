@@ -108,5 +108,44 @@ export const generateEmbeddings = async (chunks) => {
   }
 };
 
+export const getVectorCount = async () => {
+  try {
+    const response = await apiClient.get('/vectorstore/count');
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching vector count:", error);
+    const errorMessage = error.response?.data?.detail || "Failed to fetch vector count.";
+    throw new Error(errorMessage);
+  }
+};
 
+export const searchVectorStore = async (query_embeddings, n_results = 5) => {
+  try {
+    const response = await apiClient.post('/vectorstore/search', {
+      query_embeddings: query_embeddings,
+      n_results: n_results
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error searching vector store:", error);
+    const errorMessage = error.response?.data?.detail || "Failed to search vector store.";
+    throw new Error(errorMessage);
+  }
+};
+
+export const storeEmbeddings = async (ids, embeddings, documents, metadatas) => {
+  try {
+    const response = await apiClient.post('/vectorstore/store', {
+      ids,
+      embeddings,
+      documents,
+      metadatas
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error storing embeddings:", error);
+    const errorMessage = error.response?.data?.detail || "Failed to store embeddings.";
+    throw new Error(errorMessage);
+  }
+};
 

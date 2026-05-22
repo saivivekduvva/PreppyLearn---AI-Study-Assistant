@@ -7,3 +7,4 @@ aiofiles
 pdfplumber
 langchain-text-splitters
 sentence-transformers
+chromadb

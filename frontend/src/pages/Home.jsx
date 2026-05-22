@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Header from '../components/common/Header';
 import PdfUploader from '../components/common/PdfUploader';
 import PdfPreview from '../components/common/PdfPreview';
+import VectorDbDebugPanel from '../components/debug/VectorDbDebugPanel';
 import { checkHealth } from '../services/api';
 
 const Home = () => {
@@ -35,8 +36,8 @@ const Home = () => {
         </p>
         
         <div className="glass-panel" style={{ padding: '1.5rem 3rem', display: 'inline-block', marginBottom: '3rem' }}>
-          <h3 style={{ fontSize: '1.1rem', color: 'var(--text-primary)', marginBottom: '0.5rem' }}>System Status</h3>
-          <p style={{ color: 'var(--text-secondary)', fontWeight: 600, fontSize: '1.1rem' }}>{backendStatus}</p>
+          <h3 style={{ fontSize: '1.1rem', color: 'var(--text-primary)', margin: '0 0 0.5rem 0' }}>System Status</h3>
+          <p style={{ color: 'var(--text-secondary)', fontWeight: 600, fontSize: '1.1rem', margin: 0 }}>{backendStatus}</p>
         </div>
 
         <div className="w-full max-w-4xl mx-auto flex flex-col gap-10" style={{ animation: 'fadeIn 0.8s ease-out 0.2s both' }}>
@@ -53,6 +54,10 @@ const Home = () => {
               <PdfPreview filename={uploadedFilename} />
             </div>
           )}
+
+          <div className="w-full mt-4">
+            <VectorDbDebugPanel />
+          </div>
         </div>
       </main>
     </div>

@@ -1,12 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { Loader2, Database, AlertCircle, Hash, Box } from 'lucide-react';
-import { generateEmbeddings } from '../../services/api';
+import { generateEmbeddings, storeEmbeddings } from '../../services/api';
 
 const EmbeddingDebugger = ({ chunks }) => {
   const [embeddings, setEmbeddings] = useState([]);
   const [metadata, setMetadata] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [storing, setStoring] = useState(false);
+  const [storeSuccess, setStoreSuccess] = useState(false);
+
+  const handleStore = async () => {
+    setStoring(true);
+    setError('');
+    try {
+      const ids = chunks.map((_, i) => `chunk_${Date.now()}_${i}`);
+      const metas = chunks.map((_, i) => ({ source: "uploaded_doc", chunk_index: i }));
+      
+      await storeEmbeddings(ids, embeddings, chunks, metas);
+      setStoreSuccess(true);
+    } catch (err) {
+      setError(err.message || "Failed to store in Vector DB.");
+    } finally {
+      setStoring(false);
+    }
+  };
 
   const processEmbeddings = async () => {
     if (!chunks || chunks.length === 0) return;
@@ -76,10 +94,24 @@ const EmbeddingDebugger = ({ chunks }) => {
         </div>
       </div>
 
-      <div className="p-5 bg-slate-50 border-b border-slate-200">
+      <div className="p-5 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4">
         <p className="text-sm text-slate-600">
           Successfully converted <strong className="text-slate-800">{metadata?.total_chunks_processed} chunks</strong> into {metadata?.vector_dimension}-dimensional high-density floating-point vectors. These vectors map semantic meaning to math.
         </p>
+        <div className="flex gap-2">
+          {storeSuccess ? (
+             <span className="text-sm text-emerald-600 font-bold flex items-center gap-1 px-4 py-2 bg-emerald-50 rounded-lg border border-emerald-200"><Database className="w-4 h-4"/> Saved to DB!</span>
+          ) : (
+            <button
+               onClick={handleStore}
+               disabled={storing || embeddings.length === 0}
+               className="text-xs font-bold px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm whitespace-nowrap flex items-center gap-1.5"
+            >
+               {storing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Database className="w-3.5 h-3.5" />}
+               {storing ? 'Saving...' : 'Save to Vector DB'}
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="p-6 h-[500px] overflow-y-auto bg-slate-100 custom-scrollbar flex flex-col gap-5 shadow-inner">
