@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Loader2, FileText, AlertCircle, FileDigit, Layers } from 'lucide-react';
+import { Loader2, FileText, AlertCircle, FileDigit } from 'lucide-react';
 import { extractPdfText } from '../../services/api';
-import ChunkVisualizer from './ChunkVisualizer';
 
-const PdfPreview = ({ filename }) => {
+const PdfPreview = ({ filename, onTextExtracted }) => {
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -24,6 +23,9 @@ const PdfPreview = ({ filename }) => {
         if (isMounted) {
           setText(response.data.text);
           setStats({ length: response.data.length });
+          if (onTextExtracted) {
+            onTextExtracted(response.data.text);
+          }
           setLoading(false);
         }
       } catch (err) {
@@ -62,8 +64,7 @@ const PdfPreview = ({ filename }) => {
   }
 
   return (
-    <div className="flex flex-col gap-6 w-full">
-      <div className="w-full premium-card overflow-hidden flex flex-col">
+    <div className="w-full premium-card overflow-hidden flex flex-col">
         <div className="px-8 py-6 bg-white flex flex-col sm:flex-row items-center justify-between border-b border-neutral-200">
           <div className="flex items-center gap-3">
             <div className="p-3 bg-neutral-100 text-neutral-800 rounded-xl">
@@ -76,16 +77,6 @@ const PdfPreview = ({ filename }) => {
               <FileDigit className="w-4 h-4" />
               {stats.length.toLocaleString()} chars
             </div>
-            
-            {text && !showChunker && (
-              <button 
-                onClick={() => setShowChunker(true)}
-                className="premium-btn flex items-center gap-2"
-              >
-                <Layers className="w-4 h-4" />
-                Chunk for AI
-              </button>
-            )}
           </div>
         </div>
       
@@ -102,13 +93,6 @@ const PdfPreview = ({ filename }) => {
           </div>
         )}
       </div>
-    </div>
-    
-    {showChunker && text && (
-      <div className="animate-fadeIn w-full" style={{ animationDelay: '0.1s' }}>
-        <ChunkVisualizer text={text} />
-      </div>
-    )}
     </div>
   );
 };

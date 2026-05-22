@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     
     # Add your specific configurations here, e.g., API keys, DB URLs
-    # OPENAI_API_KEY: str = ""
+    GEMINI_API_KEY: str = ""
     # VECTOR_DB_URL: str = ""
 
     class Config:

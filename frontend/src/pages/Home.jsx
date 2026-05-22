@@ -2,12 +2,26 @@ import React, { useState, useEffect } from 'react';
 import Header from '../components/common/Header';
 import PdfUploader from '../components/common/PdfUploader';
 import PdfPreview from '../components/common/PdfPreview';
+import DocumentLibrary from '../components/common/DocumentLibrary';
+import ChunkVisualizer from '../components/common/ChunkVisualizer';
+import EmbeddingDebugger from '../components/common/EmbeddingDebugger';
 import VectorDbDebugPanel from '../components/debug/VectorDbDebugPanel';
-import { checkHealth } from '../services/api';
+import ChatInterface from '../components/chat/ChatInterface';
+import SummaryGenerator from '../components/study/SummaryGenerator';
+import FlashcardGenerator from '../components/study/FlashcardGenerator';
+import QuizGenerator from '../components/study/QuizGenerator';
+import { checkHealth, getDocumentText } from '../services/api';
+import { MessageSquare, FileText, Layers, HelpCircle, Loader2 } from 'lucide-react';
 
 const Home = () => {
   const [backendStatus, setBackendStatus] = useState('Checking connection...');
   const [uploadedFilename, setUploadedFilename] = useState('');
+  const [extractedText, setExtractedText] = useState('');
+  const [chunks, setChunks] = useState([]);
+  const [chunkMetadata, setChunkMetadata] = useState(null);
+  const [showDebugger, setShowDebugger] = useState(false);
+  const [activeTab, setActiveTab] = useState('chat');
+  const [isLibraryLoading, setIsLibraryLoading] = useState(false);
 
   useEffect(() => {
     const verifyConnection = async () => {
@@ -25,6 +39,30 @@ const Home = () => {
     
     verifyConnection();
   }, []);
+
+  const handleTextExtracted = (text) => setExtractedText(text);
+  const handleChunksGenerated = (generatedChunks, metadata) => {
+    setChunks(generatedChunks);
+    setChunkMetadata(metadata);
+  };
+  const handleEmbeddingsGenerated = () => {};
+
+  const handleSelectLibraryDocument = async (id, filename) => {
+    try {
+      setIsLibraryLoading(true);
+      setUploadedFilename(filename);
+      // Fetch full text from DB
+      const response = await getDocumentText(id);
+      if (response.status === 'success') {
+        setExtractedText(response.data.text);
+      }
+    } catch (err) {
+      console.error("Failed to load library document", err);
+      alert("Failed to load document text.");
+    } finally {
+      setIsLibraryLoading(false);
+    }
+  };
 
   return (
     <div className="home-page">
@@ -55,16 +93,96 @@ const Home = () => {
           </div>
         </div>
 
-        <div className="w-full mx-auto flex flex-col gap-16" style={{ animation: 'fadeIn 0.4s ease-out 0.2s both' }}>
-          
-          {uploadedFilename && (
-            <div className="animate-fadeIn w-full flex flex-col gap-6" style={{ animationDelay: '0.1s' }}>
-              <PdfPreview filename={uploadedFilename} />
-            </div>
-          )}
+        <div className="w-full mx-auto" style={{ animation: 'fadeIn 0.4s ease-out 0.2s both' }}>
+          {/* Main Layout Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+            
+            {/* Left Column: Document Pipeline */}
+            <div className="flex flex-col gap-12 w-full">
+              
+              <div className="w-full">
+                <DocumentLibrary onSelectDocument={handleSelectLibraryDocument} />
+              </div>
 
-          <div className="w-full mt-2">
-            <VectorDbDebugPanel />
+              {isLibraryLoading && (
+                <div className="w-full premium-card p-10 flex flex-col items-center justify-center min-h-[300px]">
+                  <Loader2 className="w-8 h-8 text-blue-500 animate-spin mb-4" />
+                  <p className="text-slate-700 font-medium">Loading Document...</p>
+                </div>
+              )}
+
+              {uploadedFilename && !isLibraryLoading && (
+                <div className="animate-fadeIn w-full flex flex-col gap-6" style={{ animationDelay: '0.1s' }}>
+                  <PdfPreview 
+                    filename={uploadedFilename} 
+                    onTextExtracted={handleTextExtracted}
+                  />
+                  
+                  {extractedText && (
+                    <ChunkVisualizer 
+                      text={extractedText} 
+                      onChunksGenerated={handleChunksGenerated}
+                      showDebugger={showDebugger}
+                      setShowDebugger={setShowDebugger}
+                    />
+                  )}
+                  
+                  {showDebugger && chunks.length > 0 && (
+                    <EmbeddingDebugger 
+                      chunks={chunks}
+                      chunkMetadata={chunkMetadata}
+                      onEmbeddingsGenerated={handleEmbeddingsGenerated}
+                    />
+                  )}
+                </div>
+              )}
+
+              <div className="w-full">
+                <VectorDbDebugPanel />
+              </div>
+            </div>
+
+            {/* Right Column: Study Panel (Tabs) */}
+            <div className="flex flex-col w-full h-[800px] sticky top-8">
+               
+               {/* Tab Navigation */}
+               <div className="flex bg-white rounded-t-3xl border border-neutral-200 border-b-0 overflow-hidden shadow-sm shrink-0">
+                  <button 
+                    onClick={() => setActiveTab('chat')}
+                    className={`flex-1 py-4 flex items-center justify-center gap-2 font-bold text-sm transition-all ${activeTab === 'chat' ? 'bg-neutral-900 text-white' : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900'}`}
+                  >
+                    <MessageSquare size={16} /> Chat
+                  </button>
+                  <button 
+                    onClick={() => setActiveTab('summary')}
+                    className={`flex-1 py-4 flex items-center justify-center gap-2 font-bold text-sm transition-all border-l border-neutral-100 ${activeTab === 'summary' ? 'bg-neutral-900 text-white' : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900'}`}
+                  >
+                    <FileText size={16} /> Summary
+                  </button>
+                  <button 
+                    onClick={() => setActiveTab('flashcards')}
+                    className={`flex-1 py-4 flex items-center justify-center gap-2 font-bold text-sm transition-all border-l border-neutral-100 ${activeTab === 'flashcards' ? 'bg-neutral-900 text-white' : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900'}`}
+                  >
+                    <Layers size={16} /> Cards
+                  </button>
+                  <button 
+                    onClick={() => setActiveTab('quiz')}
+                    className={`flex-1 py-4 flex items-center justify-center gap-2 font-bold text-sm transition-all border-l border-neutral-100 ${activeTab === 'quiz' ? 'bg-neutral-900 text-white' : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900'}`}
+                  >
+                    <HelpCircle size={16} /> Quiz
+                  </button>
+               </div>
+
+               {/* Tab Content Area */}
+               <div className="flex-1 overflow-hidden rounded-b-3xl border border-neutral-200 shadow-xl bg-white">
+                 {activeTab === 'chat' && <ChatInterface />}
+                 {activeTab === 'summary' && <SummaryGenerator extractedText={extractedText} />}
+                 {activeTab === 'flashcards' && <FlashcardGenerator extractedText={extractedText} />}
+                 {activeTab === 'quiz' && <QuizGenerator extractedText={extractedText} />}
+               </div>
+               
+            </div>
+
           </div>
         </div>
       </main>

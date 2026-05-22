@@ -2,6 +2,7 @@ import chromadb
 from chromadb.config import Settings as ChromaSettings
 from typing import List, Dict, Any, Optional
 from app.utils.logger import logger
+from app.utils.exceptions import VectorDBException
 
 class ChromaClient:
     def __init__(self, collection_name: str = "documents"):
@@ -18,7 +19,7 @@ class ChromaClient:
             logger.info(f"Initialized ChromaDB client with collection: {collection_name}")
         except Exception as e:
             logger.error(f"Failed to initialize ChromaDB client: {str(e)}")
-            raise e
+            raise VectorDBException(detail=f"Failed to initialize ChromaDB client: {str(e)}")
 
     def store_embeddings(
         self, 
@@ -42,7 +43,7 @@ class ChromaClient:
             return True
         except Exception as e:
             logger.error(f"Error storing embeddings in ChromaDB: {str(e)}")
-            raise e
+            raise VectorDBException(detail=str(e))
 
     def similarity_search(
         self, 
@@ -64,7 +65,7 @@ class ChromaClient:
             return results
         except Exception as e:
             logger.error(f"Error performing similarity search in ChromaDB: {str(e)}")
-            raise e
+            raise VectorDBException(detail=str(e))
 
     def delete_collection(self) -> None:
         """Deletes the entire collection (use with caution)."""
@@ -73,4 +74,4 @@ class ChromaClient:
             self.client.delete_collection(self.collection.name)
         except Exception as e:
             logger.error(f"Error deleting collection: {str(e)}")
-            raise e
+            raise VectorDBException(detail=str(e))

@@ -70,6 +70,28 @@ export const extractPdfText = async (filename) => {
   }
 };
 
+export const getLibraryDocuments = async () => {
+  try {
+    const response = await apiClient.get(`/documents/library`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching library documents:", error);
+    const errorMessage = error.response?.data?.detail || "Failed to fetch library documents.";
+    throw new Error(errorMessage);
+  }
+};
+
+export const getDocumentText = async (docId) => {
+  try {
+    const response = await apiClient.get(`/documents/library/${docId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching document text:", error);
+    const errorMessage = error.response?.data?.detail || "Failed to fetch document text.";
+    throw new Error(errorMessage);
+  }
+};
+
 /**
  * Generates semantic chunks from extracted text.
  * @param {string} text - The raw text to chunk.
@@ -146,6 +168,50 @@ export const storeEmbeddings = async (ids, embeddings, documents, metadatas) => 
     console.error("Error storing embeddings:", error);
     const errorMessage = error.response?.data?.detail || "Failed to store embeddings.";
     throw new Error(errorMessage);
+  }
+};
+
+export const sendChatQuery = async (query) => {
+  try {
+    const response = await apiClient.post('/rag/chat', { query });
+    return response.data;
+  } catch (error) {
+    console.error("Error sending chat query:", error);
+    const errorMessage = error.response?.data?.detail || "Failed to get AI response.";
+    throw new Error(errorMessage);
+  }
+};
+
+export const generateSummary = async (text, summaryType = 'short') => {
+  try {
+    const response = await apiClient.post('/generate/summary', {
+      text: text,
+      summary_type: summaryType
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error generating summary:", error);
+    throw new Error(error.response?.data?.detail || "Failed to generate summary.");
+  }
+};
+
+export const generateFlashcards = async (text) => {
+  try {
+    const response = await apiClient.post('/generate/flashcards', { text });
+    return response.data;
+  } catch (error) {
+    console.error("Error generating flashcards:", error);
+    throw new Error(error.response?.data?.detail || "Failed to generate flashcards.");
+  }
+};
+
+export const generateMCQs = async (text) => {
+  try {
+    const response = await apiClient.post('/generate/mcq', { text });
+    return response.data;
+  } catch (error) {
+    console.error("Error generating MCQs:", error);
+    throw new Error(error.response?.data?.detail || "Failed to generate MCQs.");
   }
 };
 

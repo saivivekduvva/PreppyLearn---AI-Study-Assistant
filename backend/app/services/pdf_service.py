@@ -2,7 +2,8 @@ import os
 import re
 import pdfplumber
 from app.utils.logger import logger
-from app.utils.exceptions import FileNotFoundException, PDFExtractionException
+from app.utils.exceptions import FileNotFoundException, PDFExtractionException, InvalidPDFException
+from pdfminer.pdfparser import PDFSyntaxError
 
 class PDFService:
     def __init__(self):
@@ -48,6 +49,9 @@ class PDFService:
             logger.info(f"Successfully extracted {len(clean_text)} characters from {filename}.")
             return clean_text
             
+        except PDFSyntaxError as e:
+            logger.error(f"Invalid or corrupted PDF file {filename}: {str(e)}")
+            raise InvalidPDFException()
         except Exception as e:
             logger.error(f"Failed to extract text from {filename}: {str(e)}")
             raise PDFExtractionException()

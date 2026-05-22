@@ -1,6 +1,9 @@
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel, Field
 from typing import List
+from app.services.llm_service import GeminiLLMService
+from pydantic import BaseModel, Field
+from typing import List
 from app.rag.chunker import SemanticChunker
 from app.services.embedding_service import EmbeddingService
 from app.utils.logger import logger
@@ -132,3 +135,41 @@ async def test_retrieval(request: RetrievalTestRequest):
     except Exception as e:
         logger.error(f"Retrieval testing failed: {str(e)}")
         raise HTTPException(status_code=500, detail=f"An error occurred during retrieval test: {str(e)}")
+
+class ChatRequest(BaseModel):
+    query: str = Field(..., description="User's chat message/question.")
+    top_k: int = Field(5, description="Number of top chunks to retrieve.")
+
+@router.post("/chat")
+async def chat_endpoint(request: ChatRequest):
+    """
+    RAG Chat endpoint. Retrieves context from Vector DB and generates an answer using Gemini.
+    """
+    if not request.query.strip():
+        raise HTTPException(status_code=400, detail="Query cannot be empty.")
+        
+    retriever = RAGRetriever()
+    llm_service = GeminiLLMService()
+    
+    # 1. Retrieve raw chunks
+    _, raw_chunks = retriever.retrieve_context(query=request.query, top_k=request.top_k)
+    
+    # 2. Filter out irrelevant chunks (distance >= 0.6)
+    # Cosine distance: 0.0 is exact match, 1.0+ is orthogonal/unrelated
+    relevant_chunks = []
+    context_list = []
+    for chunk in raw_chunks:
+        if chunk.get("similarity_score", 1.0) < 0.6:
+            relevant_chunks.append(chunk)
+            context_list.append(chunk.get("document", ""))
+            
+    # 3. Generate Answer
+    answer = await llm_service.generate_response(prompt=request.query, context=context_list)
+        
+    return {
+        "status": "success",
+        "data": {
+            "answer": answer,
+            "sources": relevant_chunks
+        }
+    }
