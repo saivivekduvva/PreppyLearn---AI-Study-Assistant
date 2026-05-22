@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config.settings import get_settings
-from app.api.routers import health
+from app.api.routers import health, documents
 
 settings = get_settings()
 
@@ -32,6 +32,8 @@ def create_app() -> FastAPI:
     
     # Example of including an API router
     # app.include_router(study.router, prefix=f"{settings.API_V1_STR}/study", tags=["Study"])
+    
+    app.include_router(documents.router, prefix=f"{settings.API_V1_STR}/documents", tags=["Documents"])
 
     return app
 

@@ -1,14 +1,15 @@
+import axios from 'axios';
+
 /**
  * This service handles all API calls to the FastAPI backend.
  * Keep all your fetch or axios logic centralized here.
  */
 
-// Make sure this matches your FastAPI server's port
-const API_BASE_URL = 'http://localhost:8000'; 
+const API_BASE_URL = 'http://localhost:8000/api/v1';
 
 export const checkHealth = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/health`);
+    const response = await fetch(`http://localhost:8000/health`);
     if (!response.ok) throw new Error('Network response was not ok');
     return await response.json();
   } catch (error) {
@@ -16,3 +17,56 @@ export const checkHealth = async () => {
     throw error;
   }
 };
+
+// Create an axios instance for API calls
+export const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+});
+
+/**
+ * Uploads a PDF document to the backend.
+ * @param {File} file - The PDF file to upload.
+ * @param {Function} onProgress - Callback function to handle progress (0 to 100).
+ * @returns {Promise<Object>} The API response.
+ */
+export const uploadDocument = async (file, onProgress) => {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    const response = await apiClient.post('/documents/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      onUploadProgress: (progressEvent) => {
+        if (onProgress && progressEvent.total) {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          onProgress(percentCompleted);
+        }
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error uploading document:", error);
+    // Extract meaningful error message from Axios if available
+    const errorMessage = error.response?.data?.detail || "Failed to upload document. Please try again.";
+    throw new Error(errorMessage);
+  }
+};
+
+/**
+ * Extracts text from an uploaded PDF document.
+ * @param {string} filename - The generated filename from the backend.
+ * @returns {Promise<Object>} The API response with extracted text.
+ */
+export const extractPdfText = async (filename) => {
+  try {
+    const response = await apiClient.get(`/documents/extract/${encodeURIComponent(filename)}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error extracting text:", error);
+    const errorMessage = error.response?.data?.detail || "Failed to extract text from document.";
+    throw new Error(errorMessage);
+  }
+};
+
