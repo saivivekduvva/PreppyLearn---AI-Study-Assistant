@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Loader2, FileText, AlertCircle, FileDigit } from 'lucide-react';
+import { Loader2, FileText, AlertCircle, FileDigit, Layers } from 'lucide-react';
 import { extractPdfText } from '../../services/api';
+import ChunkVisualizer from './ChunkVisualizer';
 
 const PdfPreview = ({ filename }) => {
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [stats, setStats] = useState({ length: 0 });
+  const [showChunker, setShowChunker] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -60,17 +62,30 @@ const PdfPreview = ({ filename }) => {
   }
 
   return (
-    <div className="w-full border border-slate-200 rounded-2xl bg-white shadow-xl overflow-hidden flex flex-col transform transition-all hover:shadow-2xl">
-      <div className="px-6 py-4 bg-slate-50 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <FileText className="w-5 h-5 text-sky-500" />
-          <h4 className="font-semibold text-slate-700">Document Preview</h4>
+    <div className="flex flex-col gap-10">
+      <div className="w-full border border-slate-200 rounded-2xl bg-white shadow-xl overflow-hidden flex flex-col transform transition-all hover:shadow-2xl">
+        <div className="px-6 py-4 bg-slate-50 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <FileText className="w-5 h-5 text-sky-500" />
+            <h4 className="font-semibold text-slate-700">Document Preview</h4>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500 bg-slate-200/50 px-3 py-1.5 rounded-full border border-slate-200">
+              <FileDigit className="w-3.5 h-3.5" />
+              {stats.length.toLocaleString()} chars
+            </div>
+            
+            {text && !showChunker && (
+              <button 
+                onClick={() => setShowChunker(true)}
+                className="text-xs font-bold px-4 py-1.5 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-colors shadow-sm flex items-center gap-1.5"
+              >
+                <Layers className="w-3.5 h-3.5" />
+                Chunk for AI
+              </button>
+            )}
+          </div>
         </div>
-        <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500 bg-slate-200/50 px-3 py-1 rounded-full">
-          <FileDigit className="w-3.5 h-3.5" />
-          {stats.length.toLocaleString()} characters
-        </div>
-      </div>
       
       <div className="p-8 h-[500px] overflow-y-auto bg-white custom-scrollbar text-left border-t border-slate-100 shadow-inner">
         {text ? (
@@ -85,6 +100,13 @@ const PdfPreview = ({ filename }) => {
           </div>
         )}
       </div>
+    </div>
+    
+    {showChunker && text && (
+      <div className="animate-fadeIn w-full" style={{ animationDelay: '0.1s' }}>
+        <ChunkVisualizer text={text} />
+      </div>
+    )}
     </div>
   );
 };

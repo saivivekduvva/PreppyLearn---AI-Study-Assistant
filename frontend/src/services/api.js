@@ -70,3 +70,26 @@ export const extractPdfText = async (filename) => {
   }
 };
 
+/**
+ * Generates semantic chunks from extracted text.
+ * @param {string} text - The raw text to chunk.
+ * @param {number} chunkSize - Maximum characters per chunk.
+ * @param {number} chunkOverlap - Overlap characters.
+ * @returns {Promise<Object>} The API response with chunk data.
+ */
+export const generateSemanticChunks = async (text, chunkSize = 1000, chunkOverlap = 200) => {
+  try {
+    const response = await apiClient.post('/rag/chunk', {
+      text,
+      chunk_size: chunkSize,
+      chunk_overlap: chunkOverlap
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error generating chunks:", error);
+    const errorMessage = error.response?.data?.detail || "Failed to generate chunks.";
+    throw new Error(errorMessage);
+  }
+};
+
+

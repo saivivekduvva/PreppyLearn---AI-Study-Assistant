@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config.settings import get_settings
-from app.api.routers import health, documents
+from app.api.routers import health, documents, rag
 
 settings = get_settings()
 
@@ -34,6 +34,7 @@ def create_app() -> FastAPI:
     # app.include_router(study.router, prefix=f"{settings.API_V1_STR}/study", tags=["Study"])
     
     app.include_router(documents.router, prefix=f"{settings.API_V1_STR}/documents", tags=["Documents"])
+    app.include_router(rag.router, prefix=f"{settings.API_V1_STR}/rag", tags=["RAG"])
 
     return app
 
