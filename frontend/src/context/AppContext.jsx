@@ -6,6 +6,12 @@ const AppContext = createContext();
 // Create the provider component
 export const AppProvider = ({ children }) => {
   const [theme, setTheme] = useState('light');
+  
+  // Global Document State
+  const [uploadedFilename, setUploadedFilename] = useState(null);
+  const [extractedText, setExtractedText] = useState(null);
+  const [chunks, setChunks] = useState([]);
+  const [chunkMetadata, setChunkMetadata] = useState(null);
 
   const toggleTheme = () => {
     setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
@@ -14,6 +20,15 @@ export const AppProvider = ({ children }) => {
   const value = {
     theme,
     toggleTheme,
+    // Document state
+    uploadedFilename,
+    setUploadedFilename,
+    extractedText,
+    setExtractedText,
+    chunks,
+    setChunks,
+    chunkMetadata,
+    setChunkMetadata
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

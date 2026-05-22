@@ -111,18 +111,7 @@ const ChatInterface = () => {
   };
 
   return (
-    <div className="w-full h-full min-h-[600px] max-h-[800px] flex flex-col premium-card overflow-hidden bg-neutral-50">
-      {/* Chat Header */}
-      <div className="px-8 py-6 bg-white border-b border-neutral-200 flex items-center gap-4 shrink-0">
-        <div className="p-3 bg-neutral-100 rounded-xl text-neutral-900">
-          <Bot size={24} />
-        </div>
-        <div>
-          <h3 className="text-xl font-bold text-neutral-900 tracking-tight">AI Study Assistant</h3>
-          <p className="text-sm font-semibold text-neutral-500">Retrieval-Augmented Generation</p>
-        </div>
-      </div>
-
+    <div className="w-full h-full flex flex-col overflow-hidden bg-neutral-50">
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto px-4 sm:px-8 py-6 custom-scrollbar">
         {messages.map((msg, index) => (
@@ -154,16 +143,16 @@ const ChatInterface = () => {
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            placeholder="Ask a question about your documents..."
-            className="w-full pl-6 pr-16 py-4 bg-neutral-100 border border-neutral-200 rounded-2xl text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:bg-white transition-all shadow-sm"
+            placeholder="Message AI..."
+            className="w-full pl-4 pr-12 py-3 bg-neutral-100 border border-neutral-200 rounded-xl text-sm text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:bg-white transition-all shadow-sm"
             disabled={isLoading}
           />
           <button
             type="submit"
             disabled={!inputValue.trim() || isLoading}
-            className="absolute right-2 p-3 bg-neutral-900 text-white rounded-xl hover:bg-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="absolute right-1 p-2 bg-neutral-900 text-white rounded-lg hover:bg-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? <Loader2 size={20} className="animate-spin" /> : <Send size={20} />}
+            {isLoading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
           </button>
         </form>
       </div>
