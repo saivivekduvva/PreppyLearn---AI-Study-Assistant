@@ -18,7 +18,7 @@ class RAGRetriever:
         self.embedding_service = EmbeddingService()
         self.vector_store = ChromaClient()
 
-    def retrieve_context(self, query: str, top_k: int = 5) -> Tuple[str, List[Dict[str, Any]]]:
+    def retrieve_context(self, query: str, top_k: int = 5, user_id: int = None) -> Tuple[str, List[Dict[str, Any]]]:
         """
         Executes embedding-based search to find contextually relevant information.
         Returns the formatted context string and the raw retrieved chunks for debugging.
@@ -36,9 +36,12 @@ class RAGRetriever:
 
             # Step 2: Retrieve relevant chunks
             # We search for the nearest neighbors in high-dimensional space
+            where_filter = {"user_id": user_id} if user_id else None
+            
             search_results = self.vector_store.similarity_search(
                 query_embeddings=query_embeddings,
-                n_results=top_k
+                n_results=top_k,
+                where=where_filter
             )
 
             raw_chunks = []

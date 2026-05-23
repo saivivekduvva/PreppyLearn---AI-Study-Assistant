@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { GraduationCap, ArrowRight } from 'lucide-react';
+import { GraduationCap, ArrowRight, User, LogOut } from 'lucide-react';
 import { useAppContext } from '../../context/AppContext';
+import { AuthContext } from '../../context/AuthContext';
 
 const Header = () => {
   const location = useLocation();
   const { uploadedFilename } = useAppContext();
+  const { user, logout } = useContext(AuthContext);
 
   const isActive = (path) => {
     return location.pathname === path ? "text-neutral-900 font-semibold" : "text-neutral-500 hover:text-neutral-900";
@@ -41,14 +43,24 @@ const Header = () => {
           <span className="text-xs font-medium px-2 py-1 bg-green-50 text-green-700 rounded-md border border-green-200 hidden sm:inline-block">
             Connected
           </span>
-          {uploadedFilename ? (
-             <Link to="/study" className="text-sm font-medium bg-neutral-900 text-white px-4 py-2 rounded-full hover:bg-neutral-800 transition-colors flex items-center gap-2">
-               Study Now <ArrowRight size={16} />
-             </Link>
+          {user ? (
+            <div className="flex items-center gap-4">
+              <span className="text-sm font-medium text-neutral-700 flex items-center gap-1">
+                <User size={16} /> {user.username || 'User'}
+              </span>
+              <button onClick={logout} className="text-sm font-medium text-neutral-500 hover:text-red-600 transition-colors flex items-center gap-1">
+                <LogOut size={16} /> Logout
+              </button>
+            </div>
           ) : (
-             <Link to="/" className="text-sm font-medium bg-neutral-900 text-white px-4 py-2 rounded-full hover:bg-neutral-800 transition-colors">
-               Upload PDF
-             </Link>
+            <div className="flex items-center gap-2">
+              <Link to="/login" className="text-sm font-medium text-neutral-600 hover:text-neutral-900 transition-colors">
+                Login
+              </Link>
+              <Link to="/register" className="text-sm font-medium bg-neutral-900 text-white px-4 py-2 rounded-full hover:bg-neutral-800 transition-colors">
+                Sign Up
+              </Link>
+            </div>
           )}
         </div>
 

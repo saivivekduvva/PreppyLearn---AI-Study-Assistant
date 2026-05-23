@@ -3,6 +3,8 @@ from pydantic import BaseModel, Field
 from typing import List, Dict, Any, Optional
 from app.utils.logger import logger
 from app.vectorstore.chroma_client import ChromaClient
+from app.models.user import User
+from app.api.deps import get_current_user
 
 router = APIRouter()
 
@@ -11,7 +13,7 @@ def get_chroma_client():
     return ChromaClient()
 
 @router.get("/count")
-async def get_collection_count(client: ChromaClient = Depends(get_chroma_client)):
+async def get_collection_count(client: ChromaClient = Depends(get_chroma_client), current_user: User = Depends(get_current_user)):
     """
     Returns the total number of items stored in the vector database collection.
     """
@@ -39,7 +41,8 @@ class SimilaritySearchRequest(BaseModel):
 @router.post("/store", status_code=status.HTTP_201_CREATED)
 async def store_embeddings(
     request: StoreEmbeddingsRequest, 
-    client: ChromaClient = Depends(get_chroma_client)
+    client: ChromaClient = Depends(get_chroma_client),
+    current_user: User = Depends(get_current_user)
 ):
     """
     Stores embeddings, corresponding text chunks, and metadata in the vector database.
@@ -58,6 +61,13 @@ async def store_embeddings(
             status_code=status.HTTP_400_BAD_REQUEST, 
             detail="The length of metadatas must match the length of ids."
         )
+
+    # Inject user_id into metadatas
+    if request.metadatas is None:
+        request.metadatas = [{"user_id": current_user.id} for _ in request.ids]
+    else:
+        for meta in request.metadatas:
+            meta["user_id"] = current_user.id
 
     try:
         success = client.store_embeddings(
@@ -81,7 +91,8 @@ async def store_embeddings(
 @router.post("/search")
 async def similarity_search(
     request: SimilaritySearchRequest, 
-    client: ChromaClient = Depends(get_chroma_client)
+    client: ChromaClient = Depends(get_chroma_client),
+    current_user: User = Depends(get_current_user)
 ):
     """
     Retrieves similar chunks based on provided query embeddings.
@@ -93,10 +104,14 @@ async def similarity_search(
         )
 
     try:
+        # Inject user_id into where filter
+        where_filter = request.where or {}
+        where_filter["user_id"] = current_user.id
+
         results = client.similarity_search(
             query_embeddings=request.query_embeddings,
             n_results=request.n_results,
-            where=request.where
+            where=where_filter
         )
         
         # Format response into a structured JSON

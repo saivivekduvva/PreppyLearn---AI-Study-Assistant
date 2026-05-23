@@ -1,38 +1,34 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import PdfPreview from '../components/common/PdfPreview';
+import PdfUploader from '../components/common/PdfUploader';
 import DocumentLibrary from '../components/common/DocumentLibrary';
-import ChunkVisualizer from '../components/common/ChunkVisualizer';
-import EmbeddingDebugger from '../components/common/EmbeddingDebugger';
-import VectorDbDebugPanel from '../components/debug/VectorDbDebugPanel';
 import { useAppContext } from '../context/AppContext';
 import { getDocumentText } from '../services/api';
-import { Loader2, ArrowRight } from 'lucide-react';
+import { Loader2, ArrowRight, Settings2, CheckCircle, AlertCircle } from 'lucide-react';
+import useVectorProcessing from '../hooks/useVectorProcessing';
 
 const DocumentPage = () => {
   const navigate = useNavigate();
   const { 
     uploadedFilename, setUploadedFilename, 
-    extractedText, setExtractedText,
-    chunks, setChunks,
-    chunkMetadata, setChunkMetadata
+    extractedText, setExtractedText
   } = useAppContext();
 
   const [isLibraryLoading, setIsLibraryLoading] = useState(false);
-  const [showDebugger, setShowDebugger] = useState(false);
+  const [isNewUpload, setIsNewUpload] = useState(false);
+  
+  // Custom hook automates vector DB processing for new uploads
+  const { status: processingStatus, error: processingError } = useVectorProcessing(extractedText, uploadedFilename, isNewUpload);
 
   const handleTextExtracted = (text) => {
     setExtractedText(text);
   };
 
-  const handleChunksGenerated = (generatedChunks, metadata) => {
-    setChunks(generatedChunks);
-    setChunkMetadata(metadata);
-  };
-
   const handleSelectLibraryDocument = async (id, filename) => {
     try {
       setIsLibraryLoading(true);
+      setIsNewUpload(false);
       setUploadedFilename(filename);
       const response = await getDocumentText(id);
       if (response.status === 'success') {
@@ -47,14 +43,19 @@ const DocumentPage = () => {
   };
 
   return (
-    <div className="max-w-[1400px] mx-auto px-6 py-8">
+    <div className="max-w-[1000px] mx-auto px-6 py-8">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-neutral-900 tracking-tight">Document Data</h1>
+          <div className="flex items-center gap-4">
+            <h1 className="text-3xl font-bold text-neutral-900 tracking-tight">Document Data</h1>
+            <Link to="/debug" className="px-3 py-1 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors">
+              <Settings2 size={14} /> Advanced Processing
+            </Link>
+          </div>
           <p className="text-neutral-500 mt-1">Manage, extract, and process your study materials.</p>
         </div>
         
-        {extractedText && (
+        {processingStatus === 'success' && (
           <button 
             onClick={() => navigate('/study')}
             className="flex items-center gap-2 bg-neutral-900 text-white px-6 py-3 rounded-full font-medium hover:bg-neutral-800 transition-colors"
@@ -64,62 +65,69 @@ const DocumentPage = () => {
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
-        {/* Left Column: Pipeline */}
-        <div className="lg:col-span-7 flex flex-col gap-8">
-          <DocumentLibrary onSelectDocument={handleSelectLibraryDocument} />
-
-          {isLibraryLoading && (
-            <div className="w-full premium-card p-10 flex flex-col items-center justify-center min-h-[300px]">
-              <Loader2 className="w-8 h-8 text-blue-500 animate-spin mb-4" />
-              <p className="text-slate-700 font-medium">Loading Document...</p>
-            </div>
-          )}
-
-          {uploadedFilename && !isLibraryLoading && (
-            <div className="animate-fadeIn w-full flex flex-col gap-6">
-              <PdfPreview 
-                filename={uploadedFilename} 
-                onTextExtracted={handleTextExtracted} 
-              />
-              
-              {extractedText && (
-                <ChunkVisualizer 
-                  extractedText={extractedText} 
-                  onChunksGenerated={handleChunksGenerated} 
-                />
-              )}
-
-              {chunks && chunks.length > 0 && (
-                <div className="flex flex-col gap-4">
-                  <div className="flex justify-end">
-                    <button
-                      onClick={() => setShowDebugger(!showDebugger)}
-                      className="text-sm font-medium text-neutral-500 hover:text-neutral-800 transition-colors"
-                    >
-                      {showDebugger ? 'Hide Advanced Settings' : 'Show Advanced Settings'}
-                    </button>
-                  </div>
-                  {showDebugger && (
-                    <EmbeddingDebugger 
-                      chunks={chunks}
-                      onEmbeddingsGenerated={() => {}}
-                    />
-                  )}
-                </div>
-              )}
-            </div>
-          )}
+      <div className="flex flex-col gap-8">
+        <div className="premium-card p-1 w-full">
+          <PdfUploader onUploadSuccess={(filename) => {
+            setIsNewUpload(true);
+            setUploadedFilename(filename);
+            setExtractedText(null);
+          }} />
         </div>
 
-        {/* Right Column: Database */}
-        <div className="lg:col-span-5">
-          <div className="sticky top-24">
-             <VectorDbDebugPanel />
+        <DocumentLibrary key={uploadedFilename} onSelectDocument={handleSelectLibraryDocument} />
+
+        {isLibraryLoading && (
+          <div className="w-full premium-card p-10 flex flex-col items-center justify-center min-h-[300px]">
+            <Loader2 className="w-8 h-8 text-blue-500 animate-spin mb-4" />
+            <p className="text-slate-700 font-medium">Loading Document...</p>
           </div>
-        </div>
+        )}
 
+        {uploadedFilename && !isLibraryLoading && (
+          <div className="animate-fadeIn w-full flex flex-col gap-6">
+            <PdfPreview 
+              filename={uploadedFilename} 
+              onTextExtracted={handleTextExtracted} 
+            />
+            
+            {/* Automatic Processing State */}
+            {extractedText && (
+              <div className="premium-card p-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+                <div className="flex items-center gap-4">
+                  {processingStatus === 'error' ? (
+                    <div className="p-3 bg-red-100 text-red-600 rounded-full">
+                      <AlertCircle size={24} />
+                    </div>
+                  ) : processingStatus === 'success' ? (
+                    <div className="p-3 bg-teal-100 text-teal-600 rounded-full">
+                      <CheckCircle size={24} />
+                    </div>
+                  ) : (
+                    <div className="p-3 bg-blue-100 text-blue-600 rounded-full">
+                      <Loader2 size={24} className="animate-spin" />
+                    </div>
+                  )}
+                  
+                  <div>
+                    <h3 className="font-bold text-lg text-neutral-900">
+                      {processingStatus === 'error' ? 'Processing Failed' : 
+                       processingStatus === 'success' ? 'Document Ready for AI' : 
+                       'Processing Document for AI...'}
+                    </h3>
+                    <p className="text-sm text-neutral-500">
+                      {processingStatus === 'chunking' && 'Analyzing and chunking text...'}
+                      {processingStatus === 'embedding' && 'Generating mathematical vector embeddings...'}
+                      {processingStatus === 'storing' && 'Saving context to Vector Database...'}
+                      {processingStatus === 'success' && 'You can now go to the Study Area.'}
+                      {processingStatus === 'error' && processingError}
+                    </p>
+                  </div>
+                </div>
+
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

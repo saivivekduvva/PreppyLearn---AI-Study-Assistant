@@ -5,11 +5,12 @@ import axios from 'axios';
  * Keep all your fetch or axios logic centralized here.
  */
 
-const API_BASE_URL = 'http://localhost:8000/api/v1';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+const API_BASE_URL = `${BACKEND_URL}/api/v1`;
 
 export const checkHealth = async () => {
   try {
-    const response = await fetch(`http://localhost:8000/health`);
+    const response = await fetch(`${BACKEND_URL}/health`);
     if (!response.ok) throw new Error('Network response was not ok');
     return await response.json();
   } catch (error) {

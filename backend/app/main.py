@@ -1,13 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config.settings import get_settings
-from app.api.routers import health, documents, rag, vectorstore, generate
+from app.api.routers import health, documents, rag, vectorstore, generate, auth
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from app.core.middleware import LoggingMiddleware
 from app.core.handlers import http_exception_handler, validation_exception_handler, global_exception_handler
 from app.config.database import engine, Base
 from app.models import document # Import models so SQLAlchemy knows about them
+from app.models import user
 
 settings = get_settings()
 
@@ -44,8 +45,8 @@ def create_app() -> FastAPI:
     app.add_exception_handler(Exception, global_exception_handler)
 
     # Include routers
-    # The health check is mounted at the root and API prefix
     app.include_router(health.router, prefix="/health", tags=["Health"])
+    app.include_router(auth.router, prefix=f"{settings.API_V1_STR}/auth", tags=["Auth"])
     
     # Example of including an API router
     # app.include_router(study.router, prefix=f"{settings.API_V1_STR}/study", tags=["Study"])

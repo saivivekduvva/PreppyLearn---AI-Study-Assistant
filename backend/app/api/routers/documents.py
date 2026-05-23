@@ -4,6 +4,8 @@ from app.services.upload_service import UploadService
 from app.services.pdf_service import PDFService
 from app.config.database import get_db
 from app.models.document import Document
+from app.models.user import User
+from app.api.deps import get_current_user
 
 router = APIRouter()
 
@@ -13,7 +15,8 @@ def get_upload_service():
 @router.post("/upload")
 async def upload_document(
     file: UploadFile = File(...),
-    upload_service: UploadService = Depends(get_upload_service)
+    upload_service: UploadService = Depends(get_upload_service),
+    current_user: User = Depends(get_current_user)
 ):
     """
     Upload a PDF document.
@@ -33,19 +36,20 @@ def get_pdf_service():
 async def extract_pdf_text(
     filename: str,
     pdf_service: PDFService = Depends(get_pdf_service),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     """
     Extract text from a previously uploaded PDF and save it to the database.
     """
     # Check if document already exists
-    existing_doc = db.query(Document).filter(Document.filename == filename).first()
+    existing_doc = db.query(Document).filter(Document.filename == filename, Document.user_id == current_user.id).first()
     if existing_doc:
         extracted_text = existing_doc.extracted_text
     else:
         # Extract and save
         extracted_text = pdf_service.extract_text(filename)
-        new_doc = Document(filename=filename, extracted_text=extracted_text)
+        new_doc = Document(filename=filename, extracted_text=extracted_text, user_id=current_user.id)
         db.add(new_doc)
         db.commit()
         db.refresh(new_doc)
@@ -61,11 +65,11 @@ async def extract_pdf_text(
     }
 
 @router.get("/library")
-async def get_document_library(db: Session = Depends(get_db)):
+async def get_document_library(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     """
     Fetch a list of all previously extracted documents.
     """
-    docs = db.query(Document).order_by(Document.upload_date.desc()).all()
+    docs = db.query(Document).filter(Document.user_id == current_user.id).order_by(Document.upload_date.desc()).all()
     
     return {
         "status": "success",
@@ -80,11 +84,11 @@ async def get_document_library(db: Session = Depends(get_db)):
     }
 
 @router.get("/library/{doc_id}")
-async def get_document_by_id(doc_id: int, db: Session = Depends(get_db)):
+async def get_document_by_id(doc_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     """
     Fetch the full extracted text of a specific document.
     """
-    doc = db.query(Document).filter(Document.id == doc_id).first()
+    doc = db.query(Document).filter(Document.id == doc_id, Document.user_id == current_user.id).first()
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found.")
         

@@ -1,11 +1,14 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useContext } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import PdfUploader from '../components/common/PdfUploader';
 import { useAppContext } from '../context/AppContext';
+import { AuthContext } from '../context/AuthContext';
+import { ArrowRight } from 'lucide-react';
 
 const LandingPage = () => {
   const navigate = useNavigate();
   const { setUploadedFilename, setExtractedText } = useAppContext();
+  const { user } = useContext(AuthContext);
 
   const handleUploadSuccess = (filename) => {
     setUploadedFilename(filename);
@@ -24,10 +27,17 @@ const LandingPage = () => {
         </p>
       </div>
 
-      <div className="w-full max-w-xl">
-        <div className="premium-card p-1">
-          <PdfUploader onUploadSuccess={handleUploadSuccess} />
-        </div>
+      <div className="w-full max-w-xl flex justify-center">
+        {user ? (
+          <div className="premium-card p-1 w-full">
+            <PdfUploader onUploadSuccess={handleUploadSuccess} />
+          </div>
+        ) : (
+          <Link to="/register" className="group flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-full text-lg font-medium transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+            Get Started for Free
+            <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+          </Link>
+        )}
       </div>
     </div>
   );

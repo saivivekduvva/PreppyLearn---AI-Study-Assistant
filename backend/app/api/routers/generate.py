@@ -3,6 +3,9 @@ from pydantic import BaseModel, Field
 import json
 from app.services.llm_service import GeminiLLMService
 from app.utils.logger import logger
+from fastapi import Depends
+from app.models.user import User
+from app.api.deps import get_current_user
 
 router = APIRouter()
 
@@ -14,7 +17,7 @@ class GenerateRequest(BaseModel):
     text: str = Field(..., description="The source text to generate from.")
 
 @router.post("/summary")
-async def generate_summary(request: SummaryRequest):
+async def generate_summary(request: SummaryRequest, current_user: User = Depends(get_current_user)):
     """Generates a text summary using the LLM."""
     if not request.text.strip():
         raise HTTPException(status_code=400, detail="Provided text cannot be empty.")
@@ -29,7 +32,7 @@ async def generate_summary(request: SummaryRequest):
     }
 
 @router.post("/flashcards")
-async def generate_flashcards(request: GenerateRequest):
+async def generate_flashcards(request: GenerateRequest, current_user: User = Depends(get_current_user)):
     """Generates structured JSON flashcards."""
     if not request.text.strip():
         raise HTTPException(status_code=400, detail="Provided text cannot be empty.")
@@ -48,7 +51,7 @@ async def generate_flashcards(request: GenerateRequest):
     }
 
 @router.post("/mcq")
-async def generate_mcq(request: GenerateRequest):
+async def generate_mcq(request: GenerateRequest, current_user: User = Depends(get_current_user)):
     """Generates structured JSON MCQs."""
     if not request.text.strip():
         raise HTTPException(status_code=400, detail="Provided text cannot be empty.")

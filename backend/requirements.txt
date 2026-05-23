@@ -8,3 +8,7 @@ pdfplumber
 langchain-text-splitters
 sentence-transformers
 chromadb
+sqlalchemy
+passlib[bcrypt]
+python-jose[cryptography]
+google-generativeai

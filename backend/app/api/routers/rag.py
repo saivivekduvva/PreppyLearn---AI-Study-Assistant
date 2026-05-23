@@ -7,7 +7,8 @@ from typing import List
 from app.rag.chunker import SemanticChunker
 from app.services.embedding_service import EmbeddingService
 from app.utils.logger import logger
-from app.utils.logger import logger
+from app.models.user import User
+from app.api.deps import get_current_user
 
 router = APIRouter()
 
@@ -23,7 +24,7 @@ def get_embedding_service():
     return EmbeddingService()
 
 @router.post("/chunk")
-async def generate_chunks(request: ChunkRequest):
+async def generate_chunks(request: ChunkRequest, current_user: User = Depends(get_current_user)):
     """
     Generate semantic chunks from extracted text.
     """
@@ -63,7 +64,8 @@ async def generate_chunks(request: ChunkRequest):
 @router.post("/embed")
 async def generate_embeddings(
     request: EmbedRequest,
-    embedding_service: EmbeddingService = Depends(get_embedding_service)
+    embedding_service: EmbeddingService = Depends(get_embedding_service),
+    current_user: User = Depends(get_current_user)
 ):
     """
     Generate dense vector embeddings for a list of semantic chunks.
@@ -101,7 +103,7 @@ class RetrievalTestRequest(BaseModel):
     top_k: int = Field(5, description="Number of top chunks to retrieve.")
 
 @router.post("/test-retrieval")
-async def test_retrieval(request: RetrievalTestRequest):
+async def test_retrieval(request: RetrievalTestRequest, current_user: User = Depends(get_current_user)):
     """
     Developer Utility: Test retrieval quality in the RAG pipeline.
     Displays retrieved chunks, their similarity scores, and the formulated prompt.
@@ -116,7 +118,8 @@ async def test_retrieval(request: RetrievalTestRequest):
         # Get context and debug chunks
         context, retrieved_chunks = retriever.retrieve_context(
             query=request.query, 
-            top_k=request.top_k
+            top_k=request.top_k,
+            user_id=current_user.id
         )
         
         # Build the theoretical prompt
@@ -141,7 +144,7 @@ class ChatRequest(BaseModel):
     top_k: int = Field(5, description="Number of top chunks to retrieve.")
 
 @router.post("/chat")
-async def chat_endpoint(request: ChatRequest):
+async def chat_endpoint(request: ChatRequest, current_user: User = Depends(get_current_user)):
     """
     RAG Chat endpoint. Retrieves context from Vector DB and generates an answer using Gemini.
     """
@@ -152,7 +155,7 @@ async def chat_endpoint(request: ChatRequest):
     llm_service = GeminiLLMService()
     
     # 1. Retrieve raw chunks
-    _, raw_chunks = retriever.retrieve_context(query=request.query, top_k=request.top_k)
+    _, raw_chunks = retriever.retrieve_context(query=request.query, top_k=request.top_k, user_id=current_user.id)
     
     # 2. Filter out irrelevant chunks (distance >= 0.6)
     # Cosine distance: 0.0 is exact match, 1.0+ is orthogonal/unrelated
