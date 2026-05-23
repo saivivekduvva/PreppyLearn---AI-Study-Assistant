@@ -39,3 +39,7 @@ logs/
 
 # Docker
 .docker/
+
+# Databases
+*.db
+*.sqlite3
