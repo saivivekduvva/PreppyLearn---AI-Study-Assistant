@@ -1,6 +1,6 @@
 from typing import List, Dict, Any, Tuple
 from app.services.embedding_service import EmbeddingService
-from app.vectorstore.chroma_client import ChromaClient
+from app.vectorstore.pinecone_client import PineconeClient
 from app.utils.logger import logger
 
 class RAGRetriever:
@@ -8,7 +8,7 @@ class RAGRetriever:
     RAG (Retrieval-Augmented Generation) Workflow Explanation:
     1. A user asks a question.
     2. Semantic Retrieval: We convert this question into a vector (embedding) and 
-       search our vector database (ChromaDB) for the closest matching chunks of knowledge.
+       search our vector database (Pinecone) for the closest matching chunks of knowledge.
        This is an "embedding-based search", meaning we search by meaning rather than exact keywords.
     3. Hallucination Reduction: By feeding these retrieved, factual chunks to the LLM 
        as 'context', we anchor the AI to reality and drastically reduce hallucinations.
@@ -16,7 +16,7 @@ class RAGRetriever:
     """
     def __init__(self):
         self.embedding_service = EmbeddingService()
-        self.vector_store = ChromaClient()
+        self.vector_store = PineconeClient()
 
     def retrieve_context(self, query: str, top_k: int = 5, user_id: int = None) -> Tuple[str, List[Dict[str, Any]]]:
         """

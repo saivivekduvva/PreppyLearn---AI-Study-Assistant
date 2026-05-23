@@ -7,8 +7,9 @@ aiofiles
 pdfplumber
 langchain-text-splitters
 sentence-transformers
-chromadb
+pinecone-client
 sqlalchemy
+psycopg2-binary
 passlib[bcrypt]
 python-jose[cryptography]
 google-generativeai

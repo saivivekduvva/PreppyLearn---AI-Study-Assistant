@@ -2,23 +2,25 @@ from fastapi import APIRouter, HTTPException, Depends, status
 from pydantic import BaseModel, Field
 from typing import List, Dict, Any, Optional
 from app.utils.logger import logger
-from app.vectorstore.chroma_client import ChromaClient
+from app.vectorstore.pinecone_client import PineconeClient
 from app.models.user import User
 from app.api.deps import get_current_user
 
 router = APIRouter()
 
-# Dependency to get ChromaClient
-def get_chroma_client():
-    return ChromaClient()
+# Dependency to get PineconeClient
+def get_pinecone_client():
+    return PineconeClient()
 
 @router.get("/count")
-async def get_collection_count(client: ChromaClient = Depends(get_chroma_client), current_user: User = Depends(get_current_user)):
+async def get_collection_count(client: PineconeClient = Depends(get_pinecone_client), current_user: User = Depends(get_current_user)):
     """
     Returns the total number of items stored in the vector database collection.
     """
     try:
-        count = client.collection.count()
+        # Pinecone index stats
+        stats = client.index.describe_index_stats()
+        count = stats.total_vector_count
         return {"status": "success", "count": count}
     except Exception as e:
         logger.error(f"Error fetching collection count: {str(e)}")
@@ -41,7 +43,7 @@ class SimilaritySearchRequest(BaseModel):
 @router.post("/store", status_code=status.HTTP_201_CREATED)
 async def store_embeddings(
     request: StoreEmbeddingsRequest, 
-    client: ChromaClient = Depends(get_chroma_client),
+    client: PineconeClient = Depends(get_pinecone_client),
     current_user: User = Depends(get_current_user)
 ):
     """
@@ -91,7 +93,7 @@ async def store_embeddings(
 @router.post("/search")
 async def similarity_search(
     request: SimilaritySearchRequest, 
-    client: ChromaClient = Depends(get_chroma_client),
+    client: PineconeClient = Depends(get_pinecone_client),
     current_user: User = Depends(get_current_user)
 ):
     """
