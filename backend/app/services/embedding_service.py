@@ -16,7 +16,7 @@ class EmbeddingService:
             logger.info("Gemini Embedding Service initialized successfully.")
             
         # Standard Gemini embedding model compatible with google-generativeai
-        self.model_name = "models/embedding-001"
+        self.model_name = "models/text-embedding-004"
 
     def generate_embeddings(self, chunks: List[str]) -> List[List[float]]:
         """
