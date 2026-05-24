@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import PdfUploader from '../components/common/PdfUploader';
+import DocumentUploader from '../components/common/DocumentUploader';
 import { useAppContext } from '../context/AppContext';
 import { AuthContext } from '../context/AuthContext';
 import { ArrowRight } from 'lucide-react';
@@ -30,7 +30,7 @@ const LandingPage = () => {
       <div className="w-full max-w-xl flex justify-center">
         {user ? (
           <div className="premium-card p-1 w-full">
-            <PdfUploader onUploadSuccess={handleUploadSuccess} />
+              <DocumentUploader onUploadSuccess={handleUploadSuccess} />
           </div>
         ) : (
           <Link to="/register" className="group flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-full text-lg font-medium transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1">

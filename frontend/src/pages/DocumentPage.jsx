@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import PdfPreview from '../components/common/PdfPreview';
-import PdfUploader from '../components/common/PdfUploader';
+import DocumentUploader from '../components/common/DocumentUploader';
 import DocumentLibrary from '../components/common/DocumentLibrary';
 import { useAppContext } from '../context/AppContext';
 import { getDocumentText } from '../services/api';
@@ -67,7 +67,7 @@ const DocumentPage = () => {
 
       <div className="flex flex-col gap-8">
         <div className="premium-card p-1 w-full">
-          <PdfUploader onUploadSuccess={(filename) => {
+          <DocumentUploader onUploadSuccess={(filename) => {
             setIsNewUpload(true);
             setUploadedFilename(filename);
             setExtractedText(null);

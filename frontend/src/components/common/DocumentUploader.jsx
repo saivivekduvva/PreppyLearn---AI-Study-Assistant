@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { UploadCloud, CheckCircle, AlertCircle, FileText, Loader2 } from 'lucide-react';
 import { uploadDocument } from '../../services/api';
 
-const PdfUploader = ({ onUploadSuccess }) => {
+const DocumentUploader = ({ onUploadSuccess }) => {
   const [dragActive, setDragActive] = useState(false);
   const [file, setFile] = useState(null);
   const [status, setStatus] = useState('idle'); // 'idle' | 'uploading' | 'success' | 'error'
@@ -38,9 +38,15 @@ const PdfUploader = ({ onUploadSuccess }) => {
   };
 
   const handleFile = async (selectedFile) => {
-    if (selectedFile.type !== 'application/pdf') {
+    const validTypes = [
+      'application/pdf',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      'text/plain'
+    ];
+    if (!validTypes.includes(selectedFile.type)) {
       setStatus('error');
-      setErrorMessage('Please upload a valid PDF file.');
+      setErrorMessage('Please upload a valid PDF, DOCX, PPTX, or TXT file.');
       return;
     }
 
@@ -89,7 +95,7 @@ const PdfUploader = ({ onUploadSuccess }) => {
         <input
           ref={inputRef}
           type="file"
-          accept=".pdf,application/pdf"
+          accept=".pdf,.docx,.pptx,.txt"
           className="hidden"
           onChange={handleChange}
           disabled={status === 'uploading'}
@@ -102,7 +108,7 @@ const PdfUploader = ({ onUploadSuccess }) => {
                 <UploadCloud size={48} strokeWidth={1.5} />
               </div>
             </div>
-            <h3 className="text-2xl font-bold text-neutral-900 mb-3">Upload PDF Document</h3>
+            <h3 className="text-2xl font-bold text-neutral-900 mb-3">Upload Document</h3>
             <p className="text-lg text-neutral-500">Drag & drop your file here, or click to browse</p>
           </div>
         )}
@@ -168,4 +174,4 @@ const PdfUploader = ({ onUploadSuccess }) => {
   );
 };
 
-export default PdfUploader;
+export default DocumentUploader;
