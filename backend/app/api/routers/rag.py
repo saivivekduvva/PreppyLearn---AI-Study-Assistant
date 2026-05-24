@@ -78,7 +78,7 @@ async def generate_embeddings(
         
         # Metadata generation
         embedding_metadata = {
-            "model": "all-MiniLM-L6-v2",
+            "model": "models/text-embedding-004",
             "vector_dimension": len(embeddings[0]) if embeddings else 0,
             "total_chunks_processed": len(request.chunks)
         }

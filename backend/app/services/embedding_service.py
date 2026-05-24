@@ -1,54 +1,50 @@
 from app.utils.logger import logger
 from app.utils.exceptions import EmbeddingGenerationException
+from app.config.settings import get_settings
 from typing import List
+import google.generativeai as genai
 
 class EmbeddingService:
-    _model = None  # Class-level model variable for lazy-loading (Singleton pattern)
-
-    @classmethod
-    def get_model(cls):
-        """
-        Lazy-loads the sentence-transformers model.
-        This ensures that the massive Torch/Transformers libraries and the model weights
-        are only loaded into memory when the very first embedding request hits the server,
-        rather than blocking the server's initial startup sequence.
-        """
-        if cls._model is None:
-            try:
-                from sentence_transformers import SentenceTransformer
-                logger.info("Lazy-loading embedding model 'all-MiniLM-L6-v2'. This might take a moment on first run...")
-                
-                # all-MiniLM-L6-v2 is an incredibly fast, lightweight, and highly effective model for semantic search
-                cls._model = SentenceTransformer('all-MiniLM-L6-v2')
-                
-                logger.info("Embedding model loaded successfully into memory.")
-            except ImportError:
-                logger.error("sentence-transformers is not installed. Please add it to requirements.")
-                raise EmbeddingGenerationException(detail="sentence-transformers module not found.")
-            except Exception as e:
-                logger.error(f"Failed to load embedding model: {str(e)}")
-                raise EmbeddingGenerationException(detail=f"Failed to load embedding model: {str(e)}")
-        return cls._model
+    def __init__(self):
+        self.settings = get_settings()
+        self.api_key = self.settings.GEMINI_API_KEY
+        
+        if not self.api_key:
+            logger.warning("GEMINI_API_KEY is not set in environment variables.")
+        else:
+            genai.configure(api_key=self.api_key)
+            logger.info("Gemini Embedding Service initialized successfully.")
+            
+        # Standard Gemini embedding model
+        self.model_name = "models/text-embedding-004"
 
     def generate_embeddings(self, chunks: List[str]) -> List[List[float]]:
         """
-        Generates vector embeddings for a list of text chunks.
+        Generates vector embeddings for a list of text chunks using Gemini.
         """
         if not chunks:
             logger.warning("Empty chunk list provided to embedding service.")
             return []
             
         try:
-            model = self.get_model()
-            logger.info(f"Generating vector embeddings for {len(chunks)} chunks...")
+            if not self.api_key:
+                raise EmbeddingGenerationException(detail="Gemini API Key is missing.")
+                
+            logger.info(f"Generating vector embeddings for {len(chunks)} chunks using {self.model_name}...")
             
-            # SentenceTransformer.encode returns numpy arrays. 
-            # We convert them to standard Python lists for JSON serialization.
-            embeddings = model.encode(chunks, show_progress_bar=False)
+            # Use the Gemini API to embed the chunks
+            response = genai.embed_content(
+                model=self.model_name,
+                content=chunks,
+                task_type="retrieval_document"
+            )
+            
+            # The API returns a dictionary where 'embedding' contains the list of vectors
+            embeddings = response['embedding']
             
             logger.info("Successfully generated embeddings.")
-            return embeddings.tolist()
+            return embeddings
             
         except Exception as e:
-            logger.error(f"Error generating embeddings: {str(e)}")
-            raise EmbeddingGenerationException()
+            logger.error(f"Error generating embeddings with Gemini: {str(e)}")
+            raise EmbeddingGenerationException(detail=str(e))

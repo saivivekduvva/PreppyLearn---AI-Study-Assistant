@@ -28,7 +28,7 @@ class PineconeClient:
                 logger.info(f"Creating new Pinecone index: {self.index_name}")
                 self.pc.create_index(
                     name=self.index_name,
-                    dimension=384, # all-MiniLM-L6-v2 dimension
+                    dimension=768, # Gemini embedding dimension
                     metric="cosine",
                     spec=ServerlessSpec(
                         cloud="aws",
