@@ -5,6 +5,7 @@ import FlashcardGenerator from '../components/study/FlashcardGenerator';
 import QuizGenerator from '../components/study/QuizGenerator';
 import { useAppContext } from '../context/AppContext';
 import { FileText, Layers, HelpCircle, ArrowLeft, Lock } from 'lucide-react';
+import FloatingChatWidget from '../components/chat/FloatingChatWidget';
 
 const StudyPage = () => {
   const navigate = useNavigate();
@@ -107,6 +108,9 @@ const StudyPage = () => {
           )}
         </div>
       </div>
+      
+      {/* AI Assistant is only available in the Study Area */}
+      <FloatingChatWidget />
     </div>
   );
 };

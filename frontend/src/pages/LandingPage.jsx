@@ -29,9 +29,10 @@ const LandingPage = () => {
 
       <div className="w-full max-w-xl flex justify-center">
         {user ? (
-          <div className="premium-card p-1 w-full">
-              <DocumentUploader onUploadSuccess={handleUploadSuccess} />
-          </div>
+          <Link to="/document" className="group flex items-center justify-center gap-2 bg-neutral-900 hover:bg-neutral-800 text-white px-8 py-4 rounded-full text-lg font-medium transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+            Go to My Library
+            <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+          </Link>
         ) : (
           <Link to="/register" className="group flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-full text-lg font-medium transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1">
             Get Started for Free

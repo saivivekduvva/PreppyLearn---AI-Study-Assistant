@@ -30,12 +30,16 @@ const Header = () => {
           <Link to="/" className={`text-sm transition-colors ${isActive('/')}`}>
             Home
           </Link>
-          <Link to="/document" className={`text-sm transition-colors ${isActive('/document')}`}>
-            Document Data
-          </Link>
-          <Link to="/study" className={`text-sm transition-colors ${isActive('/study')}`}>
-            Study Area
-          </Link>
+          {user && (
+            <>
+              <Link to="/document" className={`text-sm transition-colors ${isActive('/document')}`}>
+                My Library
+              </Link>
+              <Link to="/study" className={`text-sm transition-colors ${isActive('/study')}`}>
+                Study Area
+              </Link>
+            </>
+          )}
         </nav>
 
         {/* Action Buttons (Right) */}

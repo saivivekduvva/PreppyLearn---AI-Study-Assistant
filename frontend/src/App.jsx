@@ -9,7 +9,6 @@ import StudyPage from './pages/StudyPage';
 import AdvancedDebugPage from './pages/AdvancedDebugPage';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import FloatingChatWidget from './components/chat/FloatingChatWidget';
 import './App.css';
 
 const ProtectedRoute = ({ children }) => {
@@ -46,7 +45,6 @@ const App = () => {
                 </ProtectedRoute>
               } />
             </Routes>
-            <FloatingChatWidget />
           </div>
         </BrowserRouter>
       </AppProvider>
