@@ -106,6 +106,17 @@ export const getDocumentText = async (docId) => {
   }
 };
 
+export const deleteDocument = async (docId) => {
+  try {
+    const response = await apiClient.delete(`/documents/library/${docId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting document:", error);
+    const errorMessage = error.response?.data?.error?.message || error.response?.data?.detail || "Failed to delete document.";
+    throw new Error(errorMessage);
+  }
+};
+
 /**
  * Generates semantic chunks from extracted text.
  * @param {string} text - The raw text to chunk.

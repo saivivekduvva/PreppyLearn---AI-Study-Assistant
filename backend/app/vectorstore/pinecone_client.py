@@ -128,3 +128,18 @@ class PineconeClient:
         except Exception as e:
             logger.error(f"Error deleting Pinecone index: {str(e)}")
             raise VectorDBException(detail=str(e))
+
+    def delete_by_metadata(self, filter_dict: dict) -> bool:
+        """Deletes vectors from the index based on a metadata filter."""
+        if not hasattr(self, 'index'):
+            raise VectorDBException(detail="Pinecone client not properly initialized. Check API key.")
+            
+        try:
+            logger.info(f"Deleting vectors from Pinecone with filter: {filter_dict}")
+            # In Pinecone, you can pass a filter dictionary directly to delete
+            self.index.delete(filter=filter_dict)
+            logger.info("Successfully deleted vectors from Pinecone.")
+            return True
+        except Exception as e:
+            logger.error(f"Error deleting vectors from Pinecone: {str(e)}")
+            raise VectorDBException(detail=str(e))

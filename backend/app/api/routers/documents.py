@@ -1,4 +1,4 @@
-from fastapi import APIRouter, File, UploadFile, Depends, HTTPException
+from fastapi import APIRouter, File, UploadFile, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 from app.services.upload_service import UploadService
 from app.services.extraction_service import ExtractionService
@@ -6,6 +6,11 @@ from app.config.database import get_db
 from app.models.document import Document
 from app.models.user import User
 from app.api.deps import get_current_user
+from app.vectorstore.pinecone_client import PineconeClient
+import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -100,4 +105,52 @@ async def get_document_by_id(doc_id: int, db: Session = Depends(get_db), current
             "text": doc.extracted_text,
             "upload_date": doc.upload_date.isoformat()
         }
+    }
+
+def delete_document_resources(filename: str):
+    """
+    Background worker to delete vectors from Pinecone and clean up physical files.
+    """
+    try:
+        # Delete from Pinecone
+        pinecone_client = PineconeClient()
+        pinecone_client.delete_by_metadata({"source": filename})
+        logger.info(f"Successfully deleted vectors for {filename}")
+        
+        # Delete physical file from uploads folder if it exists
+        # In this project, upload_service stores it in 'uploads/'
+        upload_path = os.path.join("uploads", filename)
+        if os.path.exists(upload_path):
+            os.remove(upload_path)
+            logger.info(f"Successfully deleted file {upload_path}")
+            
+    except Exception as e:
+        logger.error(f"Failed to delete background resources for {filename}: {str(e)}")
+
+@router.delete("/library/{doc_id}")
+async def delete_document(
+    doc_id: int, 
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db), 
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Delete a document from the SQL database and schedule its vectors/files for background deletion.
+    """
+    doc = db.query(Document).filter(Document.id == doc_id, Document.user_id == current_user.id).first()
+    if not doc:
+        raise HTTPException(status_code=404, detail="Document not found.")
+        
+    filename = doc.filename
+    
+    # 1. Delete from SQL immediately
+    db.delete(doc)
+    db.commit()
+    
+    # 2. Schedule Pinecone and local file cleanup in the background
+    background_tasks.add_task(delete_document_resources, filename)
+    
+    return {
+        "status": "success",
+        "message": "Document deleted successfully."
     }

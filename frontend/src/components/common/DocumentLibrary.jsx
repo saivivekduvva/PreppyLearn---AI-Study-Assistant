@@ -1,27 +1,44 @@
 import React, { useState, useEffect } from 'react';
-import { getLibraryDocuments } from '../../services/api';
-import { BookMarked, FileText, Loader2, Clock } from 'lucide-react';
+import { getLibraryDocuments, deleteDocument } from '../../services/api';
+import { BookMarked, FileText, Loader2, Clock, Trash2 } from 'lucide-react';
 
 const DocumentLibrary = ({ onSelectDocument }) => {
   const [documents, setDocuments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [deletingId, setDeletingId] = useState(null);
+
+  const fetchDocs = async () => {
+    try {
+      const response = await getLibraryDocuments();
+      if (response.status === 'success') {
+        setDocuments(response.data);
+      }
+    } catch (err) {
+      setError('Failed to load library');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchDocs = async () => {
-      try {
-        const response = await getLibraryDocuments();
-        if (response.status === 'success') {
-          setDocuments(response.data);
-        }
-      } catch (err) {
-        setError('Failed to load library');
-      } finally {
-        setIsLoading(false);
-      }
-    };
     fetchDocs();
   }, []);
+
+  const handleDelete = async (e, docId) => {
+    e.stopPropagation(); // Prevent triggering the select document click
+    setDeletingId(docId);
+    try {
+      await deleteDocument(docId);
+      // Remove from UI immediately upon success
+      setDocuments(prev => prev.filter(doc => doc.id !== docId));
+    } catch (err) {
+      console.error("Failed to delete document", err);
+      // Optional: Add a toast notification here
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -49,22 +66,43 @@ const DocumentLibrary = ({ onSelectDocument }) => {
         ) : (
           <div className="flex flex-col p-2">
             {documents.map((doc) => (
-              <button
+              <div 
                 key={doc.id}
-                onClick={() => onSelectDocument(doc.id, doc.filename)}
-                className="w-full flex items-start gap-4 p-4 hover:bg-white rounded-xl transition-all text-left group border border-transparent hover:border-neutral-200 hover:shadow-sm"
+                className="w-full flex items-center justify-between p-4 hover:bg-white rounded-xl transition-all group border border-transparent hover:border-neutral-200 hover:shadow-sm"
               >
-                <div className="p-2 bg-neutral-100 text-neutral-400 rounded-lg group-hover:bg-blue-50 group-hover:text-blue-500 transition-colors">
-                  <FileText size={18} />
-                </div>
-                <div className="flex flex-col flex-1 overflow-hidden">
-                  <span className="font-semibold text-neutral-900 truncate">{doc.filename}</span>
-                  <div className="flex items-center gap-1 text-xs text-neutral-500 mt-1 font-medium">
-                    <Clock size={12} />
-                    {new Date(doc.upload_date).toLocaleDateString()}
+                <button
+                  onClick={() => onSelectDocument(doc.id, doc.filename)}
+                  className="flex-1 flex items-start gap-4 text-left"
+                >
+                  <div className="p-2 bg-neutral-100 text-neutral-400 rounded-lg group-hover:bg-blue-50 group-hover:text-blue-500 transition-colors">
+                    <FileText size={18} />
                   </div>
-                </div>
-              </button>
+                  <div className="flex flex-col flex-1 overflow-hidden">
+                    <span className="font-semibold text-neutral-900 truncate">{doc.filename}</span>
+                    <div className="flex items-center gap-1 text-xs text-neutral-500 mt-1 font-medium">
+                      <Clock size={12} />
+                      {new Date(doc.upload_date).toLocaleDateString()}
+                    </div>
+                  </div>
+                </button>
+                
+                <button
+                  onClick={(e) => handleDelete(e, doc.id)}
+                  disabled={deletingId === doc.id}
+                  className={`p-2 rounded-lg transition-colors ml-2 flex-shrink-0 ${
+                    deletingId === doc.id 
+                      ? 'text-neutral-400 bg-neutral-100' 
+                      : 'text-neutral-400 hover:text-red-500 hover:bg-red-50'
+                  }`}
+                  title="Delete Document"
+                >
+                  {deletingId === doc.id ? (
+                    <Loader2 size={18} className="animate-spin" />
+                  ) : (
+                    <Trash2 size={18} />
+                  )}
+                </button>
+              </div>
             ))}
           </div>
         )}
