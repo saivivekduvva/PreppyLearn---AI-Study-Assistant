@@ -51,7 +51,7 @@ export const uploadDocument = async (file, onProgress) => {
   } catch (error) {
     console.error("Error uploading document:", error);
     // Extract meaningful error message from Axios if available
-    const errorMessage = error.response?.data?.detail || "Failed to upload document. Please try again.";
+    const errorMessage = error.response?.data?.error?.message || error.response?.data?.detail || "Failed to upload document. Please try again.";
     throw new Error(errorMessage);
   }
 };
@@ -67,7 +67,7 @@ export const extractPdfText = async (filename) => {
     return response.data;
   } catch (error) {
     console.error("Error extracting text:", error);
-    const errorMessage = error.response?.data?.detail || "Failed to extract text from document.";
+    const errorMessage = error.response?.data?.error?.message || error.response?.data?.detail || "Failed to extract text from document.";
     throw new Error(errorMessage);
   }
 };
@@ -78,7 +78,7 @@ export const getLibraryDocuments = async () => {
     return response.data;
   } catch (error) {
     console.error("Error fetching library documents:", error);
-    const errorMessage = error.response?.data?.detail || "Failed to fetch library documents.";
+    const errorMessage = error.response?.data?.error?.message || error.response?.data?.detail || "Failed to fetch library documents.";
     throw new Error(errorMessage);
   }
 };
@@ -89,7 +89,7 @@ export const getDocumentText = async (docId) => {
     return response.data;
   } catch (error) {
     console.error("Error fetching document text:", error);
-    const errorMessage = error.response?.data?.detail || "Failed to fetch document text.";
+    const errorMessage = error.response?.data?.error?.message || error.response?.data?.detail || "Failed to fetch document text.";
     throw new Error(errorMessage);
   }
 };
@@ -111,7 +111,7 @@ export const generateSemanticChunks = async (text, chunkSize = 1000, chunkOverla
     return response.data;
   } catch (error) {
     console.error("Error generating chunks:", error);
-    const errorMessage = error.response?.data?.detail || "Failed to generate chunks.";
+    const errorMessage = error.response?.data?.error?.message || error.response?.data?.detail || "Failed to generate chunks.";
     throw new Error(errorMessage);
   }
 };
@@ -127,7 +127,7 @@ export const generateEmbeddings = async (chunks) => {
     return response.data;
   } catch (error) {
     console.error("Error generating embeddings:", error);
-    const errorMessage = error.response?.data?.detail || "Failed to generate embeddings.";
+    const errorMessage = error.response?.data?.error?.message || error.response?.data?.detail || "Failed to generate embeddings.";
     throw new Error(errorMessage);
   }
 };
@@ -138,7 +138,7 @@ export const getVectorCount = async () => {
     return response.data;
   } catch (error) {
     console.error("Error fetching vector count:", error);
-    const errorMessage = error.response?.data?.detail || "Failed to fetch vector count.";
+    const errorMessage = error.response?.data?.error?.message || error.response?.data?.detail || "Failed to fetch vector count.";
     throw new Error(errorMessage);
   }
 };
@@ -152,7 +152,7 @@ export const searchVectorStore = async (query_embeddings, n_results = 5) => {
     return response.data;
   } catch (error) {
     console.error("Error searching vector store:", error);
-    const errorMessage = error.response?.data?.detail || "Failed to search vector store.";
+    const errorMessage = error.response?.data?.error?.message || error.response?.data?.detail || "Failed to search vector store.";
     throw new Error(errorMessage);
   }
 };
@@ -168,7 +168,7 @@ export const storeEmbeddings = async (ids, embeddings, documents, metadatas) => 
     return response.data;
   } catch (error) {
     console.error("Error storing embeddings:", error);
-    const errorMessage = error.response?.data?.detail || "Failed to store embeddings.";
+    const errorMessage = error.response?.data?.error?.message || error.response?.data?.detail || "Failed to store embeddings.";
     throw new Error(errorMessage);
   }
 };
@@ -179,7 +179,7 @@ export const sendChatQuery = async (query) => {
     return response.data;
   } catch (error) {
     console.error("Error sending chat query:", error);
-    const errorMessage = error.response?.data?.detail || "Failed to get AI response.";
+    const errorMessage = error.response?.data?.error?.message || error.response?.data?.detail || "Failed to get AI response.";
     throw new Error(errorMessage);
   }
 };
