@@ -24,7 +24,8 @@ const Register = () => {
             await register(username, password);
             navigate('/document');
         } catch (err) {
-            setError(err.response?.data?.detail || 'Failed to register');
+            const backendError = err.response?.data?.error?.message || err.response?.data?.detail;
+            setError(backendError || 'Failed to register');
         } finally {
             setIsLoading(false);
         }
