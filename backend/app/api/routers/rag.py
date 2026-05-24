@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field
 from typing import List
 from app.rag.chunker import SemanticChunker
 from app.services.embedding_service import EmbeddingService
+from app.utils.exceptions import EmbeddingGenerationException
 from app.utils.logger import logger
 from app.models.user import User
 from app.api.deps import get_current_user
@@ -92,6 +93,9 @@ async def generate_embeddings(
             }
         }
         
+    except EmbeddingGenerationException as e:
+        logger.error(f"Embedding endpoint failed: {e.detail}")
+        raise HTTPException(status_code=500, detail=e.detail)
     except Exception as e:
         logger.error(f"Embedding endpoint failed: {str(e)}")
         raise HTTPException(status_code=500, detail="An error occurred while generating embeddings.")
