@@ -7,7 +7,7 @@ from app.config.settings import get_settings
 settings = get_settings()
 
 class PineconeClient:
-    def __init__(self, index_name: str = "preppylearn"):
+    def __init__(self, index_name: str = "preppylearn-v2"):
         """
         Initializes the Pinecone client and gets/creates the index.
         """
@@ -28,7 +28,7 @@ class PineconeClient:
                 logger.info(f"Creating new Pinecone index: {self.index_name}")
                 self.pc.create_index(
                     name=self.index_name,
-                    dimension=768, # Gemini embedding dimension
+                    dimension=3072, # Gemini embedding dimension
                     metric="cosine",
                     spec=ServerlessSpec(
                         cloud="aws",
