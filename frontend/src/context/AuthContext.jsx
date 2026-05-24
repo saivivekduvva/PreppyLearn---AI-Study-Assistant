@@ -9,13 +9,26 @@ export const AuthProvider = ({ children }) => {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        let interceptor;
+        let requestInterceptor;
+        let responseInterceptor;
         if (token) {
             // Setup interceptor to attach token
-            interceptor = apiClient.interceptors.request.use(config => {
+            requestInterceptor = apiClient.interceptors.request.use(config => {
                 config.headers.Authorization = `Bearer ${token}`;
                 return config;
             });
+
+            // Setup interceptor to handle 401 Unauthorized
+            responseInterceptor = apiClient.interceptors.response.use(
+                response => response,
+                error => {
+                    if (error.response && error.response.status === 401) {
+                        localStorage.removeItem('token');
+                        window.location.href = '/login';
+                    }
+                    return Promise.reject(error);
+                }
+            );
 
             setUser({ loggedIn: true }); // simplified
         } else {
@@ -25,9 +38,8 @@ export const AuthProvider = ({ children }) => {
         setIsLoading(false);
 
         return () => {
-            if (interceptor) {
-                apiClient.interceptors.request.eject(interceptor);
-            }
+            if (requestInterceptor) apiClient.interceptors.request.eject(requestInterceptor);
+            if (responseInterceptor) apiClient.interceptors.response.eject(responseInterceptor);
         };
     }, [token]);
 
