@@ -5,6 +5,7 @@ from app.utils.logger import logger
 from app.vectorstore.pinecone_client import PineconeClient
 from app.models.user import User
 from app.api.deps import get_current_user
+from fastapi.concurrency import run_in_threadpool
 
 router = APIRouter()
 
@@ -72,7 +73,8 @@ async def store_embeddings(
             meta["user_id"] = current_user.id
 
     try:
-        success = client.store_embeddings(
+        success = await run_in_threadpool(
+            client.store_embeddings,
             ids=request.ids,
             embeddings=request.embeddings,
             documents=request.documents,
@@ -110,7 +112,8 @@ async def similarity_search(
         where_filter = request.where or {}
         where_filter["user_id"] = current_user.id
 
-        results = client.similarity_search(
+        results = await run_in_threadpool(
+            client.similarity_search,
             query_embeddings=request.query_embeddings,
             n_results=request.n_results,
             where=where_filter

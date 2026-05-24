@@ -17,10 +17,19 @@ if db_url.startswith("postgres://"):
 connect_args = {"check_same_thread": False} if db_url.startswith("sqlite") else {}
 
 # Create the SQLAlchemy Engine
-engine = create_engine(
-    db_url, 
-    connect_args=connect_args
-)
+if db_url.startswith("postgresql"):
+    engine = create_engine(
+        db_url, 
+        pool_pre_ping=True,       # Ping the database before using a connection (fixes EOF drops)
+        pool_size=10,             # Maintain 10 connections
+        max_overflow=20,          # Allow up to 20 overflow connections during spikes
+        pool_recycle=1800         # Recycle connections after 30 minutes
+    )
+else:
+    engine = create_engine(
+        db_url, 
+        connect_args=connect_args
+    )
 
 # Create a SessionLocal class for database sessions
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

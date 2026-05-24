@@ -2,6 +2,7 @@ import google.generativeai as genai
 from app.config.settings import get_settings
 from app.utils.logger import logger
 from app.utils.exceptions import LLMServiceException
+from fastapi.concurrency import run_in_threadpool
 
 class GeminiLLMService:
     def __init__(self):
@@ -50,11 +51,10 @@ class GeminiLLMService:
 
             logger.info(f"Generating response using {self.model_name}...")
             
-            # Note: We use the synchronous generate_content because the current
-            # genai python SDK's async support can be tricky depending on the version.
-            # For a production robust system, wrapping in a threadpool is best, 
-            # but this native call is standard.
-            response = model.generate_content(final_prompt)
+            # Note: We use the synchronous generate_content wrapped in run_in_threadpool
+            # to prevent it from blocking the FastAPI event loop, since genai's async 
+            # support can be tricky depending on the version.
+            response = await run_in_threadpool(model.generate_content, final_prompt)
             
             logger.info("Successfully generated AI response.")
             return response.text
@@ -83,7 +83,7 @@ class GeminiLLMService:
             final_prompt = f"{system_instruction}\n\nText to summarize:\n{text}"
             
             logger.info(f"Generating {summary_type} summary...")
-            response = model.generate_content(final_prompt)
+            response = await run_in_threadpool(model.generate_content, final_prompt)
             return response.text
             
         except Exception as e:
@@ -115,7 +115,7 @@ class GeminiLLMService:
             )
             
             logger.info("Generating structured JSON flashcards...")
-            response = model.generate_content(prompt)
+            response = await run_in_threadpool(model.generate_content, prompt)
             return response.text
             
         except Exception as e:
@@ -148,7 +148,7 @@ class GeminiLLMService:
             )
             
             logger.info("Generating structured JSON MCQs...")
-            response = model.generate_content(prompt)
+            response = await run_in_threadpool(model.generate_content, prompt)
             return response.text
             
         except Exception as e:

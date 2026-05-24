@@ -10,6 +10,7 @@ from app.utils.exceptions import EmbeddingGenerationException
 from app.utils.logger import logger
 from app.models.user import User
 from app.api.deps import get_current_user
+from fastapi.concurrency import run_in_threadpool
 
 router = APIRouter()
 
@@ -75,7 +76,7 @@ async def generate_embeddings(
         raise HTTPException(status_code=400, detail="Chunks list cannot be empty.")
         
     try:
-        embeddings = embedding_service.generate_embeddings(request.chunks)
+        embeddings = await run_in_threadpool(embedding_service.generate_embeddings, request.chunks)
         
         # Metadata generation
         embedding_metadata = {
@@ -119,8 +120,9 @@ async def test_retrieval(request: RetrievalTestRequest, current_user: User = Dep
     try:
         retriever = RAGRetriever()
         
-        # Get context and debug chunks
-        context, retrieved_chunks = retriever.retrieve_context(
+        # Get context and debug chunks (run in threadpool since Pinecone calls are synchronous)
+        context, retrieved_chunks = await run_in_threadpool(
+            retriever.retrieve_context,
             query=request.query, 
             top_k=request.top_k,
             user_id=current_user.id
@@ -158,8 +160,13 @@ async def chat_endpoint(request: ChatRequest, current_user: User = Depends(get_c
     retriever = RAGRetriever()
     llm_service = GeminiLLMService()
     
-    # 1. Retrieve raw chunks
-    _, raw_chunks = retriever.retrieve_context(query=request.query, top_k=request.top_k, user_id=current_user.id)
+    # 1. Retrieve raw chunks (run in threadpool)
+    _, raw_chunks = await run_in_threadpool(
+        retriever.retrieve_context, 
+        query=request.query, 
+        top_k=request.top_k, 
+        user_id=current_user.id
+    )
     
     # 2. Filter out irrelevant chunks (distance >= 0.6)
     # Cosine distance: 0.0 is exact match, 1.0+ is orthogonal/unrelated

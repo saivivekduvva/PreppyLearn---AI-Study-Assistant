@@ -10,19 +10,31 @@ const BACKEND_URL = RAW_BACKEND_URL.replace(/\/+$/, '');
 const API_BASE_URL = `${BACKEND_URL}/api/v1`;
 
 export const checkHealth = async () => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout for health check
+  
   try {
-    const response = await fetch(`${BACKEND_URL}/health`);
+    const response = await fetch(`${BACKEND_URL}/health`, {
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
     if (!response.ok) throw new Error('Network response was not ok');
     return await response.json();
   } catch (error) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      console.error("Health check timed out");
+      throw new Error('Health check timed out after 10 seconds');
+    }
     console.error("Error connecting to backend:", error);
     throw error;
   }
 };
 
-// Create an axios instance for API calls
+// Create an axios instance for API calls with a 60-second timeout
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
+  timeout: 60000,
 });
 
 /**
