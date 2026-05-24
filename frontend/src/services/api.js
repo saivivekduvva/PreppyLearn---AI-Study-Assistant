@@ -5,7 +5,8 @@ import axios from 'axios';
  * Keep all your fetch or axios logic centralized here.
  */
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+const RAW_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+const BACKEND_URL = RAW_BACKEND_URL.replace(/\/+$/, '');
 const API_BASE_URL = `${BACKEND_URL}/api/v1`;
 
 export const checkHealth = async () => {
