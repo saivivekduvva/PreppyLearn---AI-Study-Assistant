@@ -80,7 +80,7 @@ async def generate_embeddings(
         
         # Metadata generation
         embedding_metadata = {
-            "model": "models/text-embedding-004",
+            "model": embedding_service.model_name,
             "vector_dimension": len(embeddings[0]) if embeddings else 0,
             "total_chunks_processed": len(request.chunks)
         }
