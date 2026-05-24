@@ -12,8 +12,8 @@ class FileNotFoundException(HTTPException):
     def __init__(self, detail: str = "The requested file was not found."):
         super().__init__(status_code=status.HTTP_404_NOT_FOUND, detail=detail)
 
-class PDFExtractionException(HTTPException):
-    def __init__(self, detail: str = "An error occurred while extracting text from the PDF."):
+class DocumentExtractionException(HTTPException):
+    def __init__(self, detail: str = "An error occurred while extracting text from the document."):
         super().__init__(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=detail)
 
 class EmbeddingGenerationException(HTTPException):
@@ -31,7 +31,7 @@ class VectorDBException(HTTPException):
         super().__init__(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=detail)
         self.error_code = "VECTOR_DB_ERROR"
 
-class InvalidPDFException(HTTPException):
-    def __init__(self, detail: str = "The uploaded PDF is invalid, corrupted, or password-protected."):
+class InvalidDocumentException(HTTPException):
+    def __init__(self, detail: str = "The uploaded document is invalid, corrupted, or password-protected."):
         super().__init__(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=detail)
-        self.error_code = "INVALID_PDF_FILE"
+        self.error_code = "INVALID_DOCUMENT_FILE"

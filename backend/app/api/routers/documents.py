@@ -1,7 +1,7 @@
 from fastapi import APIRouter, File, UploadFile, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.services.upload_service import UploadService
-from app.services.pdf_service import PDFService
+from app.services.extraction_service import ExtractionService
 from app.config.database import get_db
 from app.models.document import Document
 from app.models.user import User
@@ -19,7 +19,7 @@ async def upload_document(
     current_user: User = Depends(get_current_user)
 ):
     """
-    Upload a PDF document.
+    Upload a document (PDF, DOCX, PPTX, TXT).
     """
     result = await upload_service.save_file_async(file)
     
@@ -29,18 +29,18 @@ async def upload_document(
         "data": result
     }
 
-def get_pdf_service():
-    return PDFService()
+def get_extraction_service():
+    return ExtractionService()
 
 @router.get("/extract/{filename}")
-async def extract_pdf_text(
+async def extract_document_text(
     filename: str,
-    pdf_service: PDFService = Depends(get_pdf_service),
+    extraction_service: ExtractionService = Depends(get_extraction_service),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
     """
-    Extract text from a previously uploaded PDF and save it to the database.
+    Extract text from a previously uploaded document and save it to the database.
     """
     # Check if document already exists
     existing_doc = db.query(Document).filter(Document.filename == filename, Document.user_id == current_user.id).first()
@@ -48,7 +48,7 @@ async def extract_pdf_text(
         extracted_text = existing_doc.extracted_text
     else:
         # Extract and save
-        extracted_text = pdf_service.extract_text(filename)
+        extracted_text = extraction_service.extract_text(filename)
         new_doc = Document(filename=filename, extracted_text=extracted_text, user_id=current_user.id)
         db.add(new_doc)
         db.commit()

@@ -11,19 +11,28 @@ class UploadService:
         # Ensure upload directory exists
         os.makedirs(self.upload_dir, exist_ok=True)
 
-    def validate_pdf(self, file: UploadFile):
-        """Validates that the uploaded file is a PDF."""
-        if file.content_type != "application/pdf":
+    def validate_document(self, file: UploadFile):
+        """Validates that the uploaded file is a supported document."""
+        allowed_content_types = [
+            "application/pdf",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            "text/plain"
+        ]
+        
+        allowed_extensions = (".pdf", ".docx", ".pptx", ".txt")
+        
+        if file.content_type not in allowed_content_types:
             logger.warning(f"Invalid file upload attempt: {file.filename} ({file.content_type})")
-            raise InvalidFileTypeException()
+            raise InvalidFileTypeException(detail=f"Unsupported file type: {file.content_type}")
             
-        if not file.filename.lower().endswith(".pdf"):
+        if not file.filename.lower().endswith(allowed_extensions):
             logger.warning(f"Invalid file extension: {file.filename}")
-            raise InvalidFileTypeException(detail="File must have a .pdf extension.")
+            raise InvalidFileTypeException(detail=f"File must have one of the following extensions: {', '.join(allowed_extensions)}")
 
     async def save_file_async(self, file: UploadFile) -> dict:
         """Asynchronously saves the file to the uploads directory."""
-        self.validate_pdf(file)
+        self.validate_document(file)
         
         file_id = str(uuid.uuid4())
         safe_filename = f"{file_id}_{file.filename}"

@@ -12,3 +12,5 @@ psycopg2-binary
 passlib[bcrypt]
 python-jose[cryptography]
 google-generativeai
+python-docx
+python-pptx
