@@ -6,7 +6,7 @@ python-multipart
 aiofiles
 pdfplumber
 langchain-text-splitters
-pinecone-client
+pinecone
 sqlalchemy
 psycopg2-binary
 passlib[bcrypt]
