@@ -7,7 +7,7 @@ from app.config.settings import get_settings
 settings = get_settings()
 
 class PineconeClient:
-    def __init__(self, index_name: str = "preppylearn-v2"):
+    def __init__(self, index_name: str = "preppylearn"):
         """
         Initializes the Pinecone client and gets/creates the index.
         """
