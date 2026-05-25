@@ -8,7 +8,7 @@ const SummaryGenerator = ({ extractedText }) => {
   const [summaryType, setSummaryType] = useState('short');
   const [error, setError] = useState('');
 
-  const handleGenerate = async () => {
+  const handleGenerate = async (overrideType = null) => {
     if (!extractedText) {
       setError("Please wait for text to be extracted from the document.");
       return;
@@ -17,14 +17,24 @@ const SummaryGenerator = ({ extractedText }) => {
     setIsLoading(true);
     setError('');
     
+    const typeToUse = overrideType || summaryType;
+    
     try {
-      const response = await generateSummary(extractedText, summaryType);
+      const response = await generateSummary(extractedText, typeToUse);
       setSummary(response.data.summary);
+      if (overrideType) {
+        setSummaryType(overrideType);
+      }
     } catch (err) {
       setError(err.message || "Failed to generate summary");
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleInlineTypeChange = (newType) => {
+    if (newType === summaryType || isLoading) return;
+    handleGenerate(newType);
   };
 
   return (
@@ -86,8 +96,8 @@ const SummaryGenerator = ({ extractedText }) => {
                 </div>
 
                 <button 
-                  onClick={handleGenerate}
-                  disabled={!extractedText}
+                  onClick={() => handleGenerate()}
+                  disabled={!extractedText || isLoading}
                   className="mt-8 w-full py-4 bg-neutral-900 hover:bg-black text-white font-bold rounded-xl transition-colors shadow-md disabled:opacity-50"
                 >
                   Generate Now
@@ -101,33 +111,26 @@ const SummaryGenerator = ({ extractedText }) => {
           <div className="flex flex-col gap-6 animate-fadeIn w-full max-w-4xl mx-auto">
             {/* Inline Controls Header */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-white p-3 sm:p-4 rounded-2xl border border-neutral-200 shadow-sm gap-4">
-              <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0 hide-scrollbar">
+              <div className="flex items-center gap-2 overflow-x-auto w-full pb-2 sm:pb-0 hide-scrollbar">
                 {[
-                  { id: 'short', label: 'Brief' },
-                  { id: 'detailed', label: 'Detailed' },
-                  { id: 'exam', label: 'Exam' }
+                  { id: 'short', label: 'Brief Summary' },
+                  { id: 'detailed', label: 'Detailed Notes' },
+                  { id: 'exam', label: 'Exam Revision' }
                 ].map((type) => (
                   <button
                     key={type.id}
-                    onClick={() => setSummaryType(type.id)}
-                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap ${
+                    onClick={() => handleInlineTypeChange(type.id)}
+                    disabled={isLoading}
+                    className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap flex-1 text-center sm:flex-none ${
                       summaryType === type.id 
-                      ? 'bg-neutral-100 text-neutral-900' 
-                      : 'text-neutral-500 hover:bg-neutral-50'
+                      ? 'bg-neutral-900 text-white shadow-sm' 
+                      : 'text-neutral-600 hover:bg-neutral-100'
                     }`}
                   >
-                    {type.label}
+                    {isLoading && summaryType === type.id ? 'Generating...' : type.label}
                   </button>
                 ))}
               </div>
-              <button 
-                onClick={handleGenerate}
-                disabled={isLoading}
-                className="w-full sm:w-auto px-6 py-2 bg-neutral-900 hover:bg-black text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
-              >
-                {isLoading ? <Loader2 className="animate-spin" size={16} /> : <RotateCcw size={16} />}
-                {isLoading ? 'Generating...' : 'Regenerate'}
-              </button>
             </div>
             
             {error && <p className="text-red-500 text-sm font-semibold text-center">{error}</p>}

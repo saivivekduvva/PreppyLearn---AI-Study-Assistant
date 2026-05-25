@@ -74,13 +74,17 @@ class GeminiLLMService:
             model = genai.GenerativeModel(self.model_name)
             
             prompts = {
-                "short": "Provide a concise, 3-5 sentence summary of the following text focusing strictly on the main ideas.",
-                "detailed": "Provide a comprehensive, highly detailed summary of the following text, broken down by key themes or sections.",
-                "exam": "Convert the following text into highly structured exam revision notes. Use bullet points, highlight key terms, and emphasize concepts likely to be tested."
+                "short": "Provide a highly concise, 3-5 sentence summary focusing STRICTLY on the main ideas. Keep it extremely brief.",
+                "detailed": "Provide a comprehensive, highly detailed summary. Break it down by key themes, sections, or concepts, using detailed paragraphs.",
+                "exam": "Convert the text into highly structured exam revision notes. You MUST use bullet points, highlight key terms, and emphasize concepts likely to be tested on an exam."
             }
             
             system_instruction = prompts.get(summary_type, prompts["short"])
-            final_prompt = f"{system_instruction}\n\nText to summarize:\n{text}"
+            final_prompt = (
+                f"INSTRUCTIONS:\n{system_instruction}\n\n"
+                f"Please apply the above instructions to the following text:\n\n"
+                f"{text}"
+            )
             
             logger.info(f"Generating {summary_type} summary...")
             response = await run_in_threadpool(model.generate_content, final_prompt)
