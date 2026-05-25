@@ -4,30 +4,72 @@ import SummaryGenerator from '../components/study/SummaryGenerator';
 import FlashcardGenerator from '../components/study/FlashcardGenerator';
 import QuizGenerator from '../components/study/QuizGenerator';
 import { useAppContext } from '../context/AppContext';
-import { FileText, Layers, HelpCircle, ArrowLeft, Lock } from 'lucide-react';
+import { FileText, Layers, HelpCircle, ArrowLeft, Lock, Loader2, BookOpen } from 'lucide-react';
 import FloatingChatWidget from '../components/chat/FloatingChatWidget';
+import DocumentLibrary from '../components/common/DocumentLibrary';
+import { getDocumentText } from '../services/api';
 
 const StudyPage = () => {
   const navigate = useNavigate();
-  const { extractedText, uploadedFilename } = useAppContext();
+  const { extractedText, uploadedFilename, setUploadedFilename, setExtractedText } = useAppContext();
   const [activeTab, setActiveTab] = useState('summary');
+  const [isDocumentLoading, setIsDocumentLoading] = useState(false);
+
+  const handleSelectLibraryDocument = async (id, filename) => {
+    try {
+      setIsDocumentLoading(true);
+      const response = await getDocumentText(id);
+      if (response.status === 'success') {
+        setUploadedFilename(filename);
+        setExtractedText(response.data.text);
+      }
+    } catch (err) {
+      console.error("Failed to load library document", err);
+      alert("Failed to load document text.");
+    } finally {
+      setIsDocumentLoading(false);
+    }
+  };
 
   if (!extractedText) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
-        <div className="p-4 bg-neutral-100 rounded-full text-neutral-400 mb-6">
-          <Lock size={48} strokeWidth={1.5} />
+      <div className="relative min-h-[80vh] flex flex-col items-center justify-center px-4 overflow-hidden">
+        {/* Background Blur Effect */}
+        <div className="absolute inset-0 bg-neutral-50/50 backdrop-blur-sm z-0"></div>
+        
+        {/* Floating Modal Window */}
+        <div className="z-10 w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-neutral-100 overflow-hidden animate-fadeIn transform transition-all">
+          <div className="p-8 text-center bg-gradient-to-b from-blue-50 to-white border-b border-neutral-100">
+            <div className="mx-auto w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-4 shadow-sm">
+              <BookOpen size={32} />
+            </div>
+            <h2 className="text-3xl font-bold text-neutral-900 tracking-tight mb-2">Select a Document</h2>
+            <p className="text-neutral-500 max-w-md mx-auto">
+              Choose a document from your library to start generating summaries, flashcards, and quizzes.
+            </p>
+          </div>
+          
+          <div className="p-6 bg-neutral-50/30">
+            {isDocumentLoading ? (
+              <div className="flex flex-col items-center justify-center min-h-[300px]">
+                <Loader2 className="w-10 h-10 text-blue-500 animate-spin mb-4" />
+                <p className="text-neutral-700 font-medium">Opening document...</p>
+                <p className="text-sm text-neutral-500 mt-1">Fetching your study materials</p>
+              </div>
+            ) : (
+              <DocumentLibrary onSelectDocument={handleSelectLibraryDocument} />
+            )}
+          </div>
+          
+          <div className="p-4 bg-white border-t border-neutral-100 text-center">
+            <button 
+              onClick={() => navigate('/document')}
+              className="text-sm text-neutral-500 hover:text-neutral-900 font-medium transition-colors"
+            >
+              Need to upload a new one? Go to Uploads
+            </button>
+          </div>
         </div>
-        <h2 className="text-3xl font-bold text-neutral-900 tracking-tight mb-4">Study Area Locked</h2>
-        <p className="text-neutral-500 max-w-md mb-8">
-          You need to process a document before you can use the study tools. Please go back and select or upload a document.
-        </p>
-        <button 
-          onClick={() => navigate('/document')}
-          className="bg-neutral-900 text-white px-6 py-3 rounded-full font-medium hover:bg-neutral-800 transition-colors"
-        >
-          Go to Documents
-        </button>
       </div>
     );
   }
