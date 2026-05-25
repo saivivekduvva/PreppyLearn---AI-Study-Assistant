@@ -8,6 +8,7 @@ import DocumentPage from './pages/DocumentPage';
 import StudyPage from './pages/StudyPage';
 import AdvancedDebugPage from './pages/AdvancedDebugPage';
 import AdminDashboard from './pages/AdminDashboard';
+import ProfilePage from './pages/ProfilePage';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import './App.css';
@@ -48,6 +49,11 @@ const App = () => {
               <Route path="/admin" element={
                 <ProtectedRoute>
                   <AdminDashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/profile" element={
+                <ProtectedRoute>
+                  <ProfilePage />
                 </ProtectedRoute>
               } />
             </Routes>

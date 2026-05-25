@@ -54,10 +54,10 @@ const Header = () => {
           </span>
           {user ? (
             <div className="flex items-center gap-4">
-              <span className="text-sm font-medium text-neutral-700 flex items-center gap-1">
+              <Link to="/profile" className="text-sm font-medium text-neutral-700 hover:text-neutral-900 hover:bg-neutral-100 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors">
                 <User size={16} /> {user.username || 'User'}
-              </span>
-              <button onClick={logout} className="text-sm font-medium text-neutral-500 hover:text-red-600 transition-colors flex items-center gap-1">
+              </Link>
+              <button onClick={logout} className="text-sm font-medium text-neutral-500 hover:text-red-600 transition-colors flex items-center gap-1 px-2">
                 <LogOut size={16} /> Logout
               </button>
             </div>

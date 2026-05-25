@@ -42,3 +42,19 @@ async def get_all_users(db: Session = Depends(get_db), admin_user: User = Depend
         "status": "success",
         "data": users_data
     }
+
+@router.get("/me")
+async def get_my_profile(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    """
+    Fetch the current user's profile and document count.
+    """
+    doc_count = db.query(Document).filter(Document.user_id == current_user.id).count()
+
+    return {
+        "status": "success",
+        "data": {
+            "id": current_user.id,
+            "username": current_user.username,
+            "document_count": doc_count
+        }
+    }
