@@ -6,11 +6,11 @@ const FloatingChatWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+    <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 flex flex-col items-end">
       
       {/* Chat Window Overlay */}
       {isOpen && (
-        <div className="mb-4 w-[380px] h-[600px] max-h-[80vh] bg-white rounded-2xl shadow-2xl border border-neutral-200 overflow-hidden flex flex-col animate-fadeIn">
+        <div className="mb-4 w-[calc(100vw-32px)] sm:w-[380px] h-[600px] max-h-[calc(100vh-100px)] sm:max-h-[80vh] bg-white rounded-2xl shadow-2xl border border-neutral-200 overflow-hidden flex flex-col animate-fadeIn origin-bottom-right">
           <div className="bg-neutral-900 text-white px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <MessageSquare size={18} />

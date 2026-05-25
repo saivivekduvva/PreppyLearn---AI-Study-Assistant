@@ -113,7 +113,7 @@ const ChatInterface = () => {
   return (
     <div className="w-full h-full flex flex-col overflow-hidden bg-neutral-50">
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto px-4 sm:px-8 py-6 custom-scrollbar">
+      <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 sm:py-6 custom-scrollbar">
         {messages.map((msg, index) => (
           <MessageBubble key={index} message={msg} />
         ))}
@@ -137,7 +137,7 @@ const ChatInterface = () => {
       </div>
 
       {/* Input Area */}
-      <div className="p-6 bg-white border-t border-neutral-200 shrink-0">
+      <div className="p-4 sm:p-6 bg-white border-t border-neutral-200 shrink-0">
         <form onSubmit={handleSubmit} className="relative flex items-center">
           <input
             type="text"
