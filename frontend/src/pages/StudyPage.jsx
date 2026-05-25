@@ -49,7 +49,7 @@ const StudyPage = () => {
             </p>
           </div>
           
-          <div className="p-4 bg-neutral-50/30">
+          <div className="bg-neutral-50/30">
             {isDocumentLoading ? (
               <div className="flex flex-col items-center justify-center min-h-[300px]">
                 <Loader2 className="w-10 h-10 text-blue-500 animate-spin mb-4" />
@@ -57,7 +57,7 @@ const StudyPage = () => {
                 <p className="text-sm text-neutral-500 mt-1">Fetching your study materials</p>
               </div>
             ) : (
-              <DocumentLibrary onSelectDocument={handleSelectLibraryDocument} showDelete={false} />
+              <DocumentLibrary onSelectDocument={handleSelectLibraryDocument} showDelete={false} isCompact={true} />
             )}
           </div>
           

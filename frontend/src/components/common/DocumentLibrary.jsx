@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getLibraryDocuments, deleteDocument } from '../../services/api';
 import { BookMarked, FileText, Loader2, Clock, Trash2 } from 'lucide-react';
 
-const DocumentLibrary = ({ onSelectDocument, showDelete = true }) => {
+const DocumentLibrary = ({ onSelectDocument, showDelete = true, isCompact = false }) => {
   const [documents, setDocuments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -53,7 +53,7 @@ const DocumentLibrary = ({ onSelectDocument, showDelete = true }) => {
 
   if (isLoading) {
     return (
-      <div className="w-full premium-card p-6 flex flex-col items-center justify-center min-h-[200px]">
+      <div className={`w-full flex flex-col items-center justify-center ${isCompact ? 'p-8 min-h-[300px]' : 'premium-card p-6 min-h-[200px]'}`}>
         <Loader2 className="animate-spin text-neutral-400 mb-4" size={24} />
         <p className="text-sm text-neutral-600 font-medium mb-1">Loading Library...</p>
         {isSlowLoading && (
@@ -66,15 +66,17 @@ const DocumentLibrary = ({ onSelectDocument, showDelete = true }) => {
   }
 
   return (
-    <div className="w-full premium-card overflow-hidden flex flex-col">
-      <div className="px-6 py-4 bg-white flex items-center gap-3 border-b border-neutral-200">
-        <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
-          <BookMarked size={20} />
+    <div className={`w-full flex flex-col ${isCompact ? 'bg-transparent' : 'premium-card overflow-hidden'}`}>
+      {!isCompact && (
+        <div className="px-6 py-4 bg-white flex items-center gap-3 border-b border-neutral-200">
+          <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
+            <BookMarked size={20} />
+          </div>
+          <h4 className="font-bold text-lg text-neutral-900 tracking-tight">Your Library</h4>
         </div>
-        <h4 className="font-bold text-lg text-neutral-900 tracking-tight">Your Library</h4>
-      </div>
+      )}
       
-      <div className="flex-1 overflow-y-auto max-h-[400px] custom-scrollbar bg-neutral-50/50">
+      <div className={`flex-1 overflow-y-auto custom-scrollbar ${isCompact ? 'max-h-[350px] p-4' : 'max-h-[400px] bg-neutral-50/50'}`}>
         {error ? (
           <div className="p-8 flex flex-col items-center justify-center text-center">
             <p className="text-red-500 font-medium text-sm mb-4">{error}</p>
@@ -90,15 +92,19 @@ const DocumentLibrary = ({ onSelectDocument, showDelete = true }) => {
             No previous documents found.
           </div>
         ) : (
-          <div className="flex flex-col p-2">
+          <div className={`flex flex-col ${isCompact ? 'gap-3' : 'p-2'}`}>
             {documents.map((doc) => (
               <div 
                 key={doc.id}
-                className="w-full flex items-center justify-between p-4 hover:bg-white rounded-xl transition-all group border border-transparent hover:border-neutral-200 hover:shadow-sm"
+                className={`w-full flex items-center justify-between hover:bg-white rounded-xl transition-all group ${
+                  isCompact 
+                  ? 'p-3 bg-white border border-neutral-200 shadow-sm hover:border-blue-300 hover:shadow-md' 
+                  : 'p-4 border border-transparent hover:border-neutral-200 hover:shadow-sm'
+                }`}
               >
                 <button
                   onClick={() => onSelectDocument(doc.id, doc.filename)}
-                  className="flex-1 flex items-start gap-4 text-left min-w-0"
+                  className="flex-1 flex items-start gap-4 text-left min-w-0 outline-none"
                 >
                   <div className="p-2 bg-neutral-100 text-neutral-400 rounded-lg group-hover:bg-blue-50 group-hover:text-blue-500 transition-colors shrink-0">
                     <FileText size={18} />
