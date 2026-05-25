@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config.settings import get_settings
-from app.api.routers import health, documents, rag, vectorstore, generate, auth
+from app.api.routers import health, documents, rag, vectorstore, generate, auth, users
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from app.core.middleware import LoggingMiddleware
@@ -47,6 +47,7 @@ def create_app() -> FastAPI:
     # Include routers
     app.include_router(health.router, prefix="/health", tags=["Health"])
     app.include_router(auth.router, prefix=f"{settings.API_V1_STR}/auth", tags=["Auth"])
+    app.include_router(users.router, prefix=f"{settings.API_V1_STR}/users", tags=["Users"])
     
     # Example of including an API router
     # app.include_router(study.router, prefix=f"{settings.API_V1_STR}/study", tags=["Study"])

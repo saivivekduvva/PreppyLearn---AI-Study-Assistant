@@ -7,6 +7,7 @@ import LandingPage from './pages/LandingPage';
 import DocumentPage from './pages/DocumentPage';
 import StudyPage from './pages/StudyPage';
 import AdvancedDebugPage from './pages/AdvancedDebugPage';
+import AdminDashboard from './pages/AdminDashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import './App.css';
@@ -42,6 +43,11 @@ const App = () => {
               <Route path="/debug" element={
                 <ProtectedRoute>
                   <AdvancedDebugPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin" element={
+                <ProtectedRoute>
+                  <AdminDashboard />
                 </ProtectedRoute>
               } />
             </Routes>

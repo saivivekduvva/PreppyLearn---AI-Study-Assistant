@@ -38,6 +38,11 @@ const Header = () => {
               <Link to="/study" className={`text-sm transition-colors ${isActive('/study')}`}>
                 Study Area
               </Link>
+              {user.username === 'admin' && (
+                <Link to="/admin" className={`text-sm font-semibold transition-colors flex items-center gap-1 ${isActive('/admin')}`}>
+                  <User size={14} /> Admin Panel
+                </Link>
+              )}
             </>
           )}
         </nav>
