@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
+import { apiClient } from '../services/api';
 import { Users, FileText, Activity, ShieldAlert, Loader2 } from 'lucide-react';
 
 const AdminDashboard = () => {
@@ -11,23 +12,10 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const token = localStorage.getItem('token');
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
-        
-        const response = await fetch(`${API_URL}/users/all`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        
-        if (!response.ok) {
-          throw new Error('Failed to fetch user data');
-        }
-        
-        const data = await response.json();
-        setUsersData(data.data);
+        const response = await apiClient.get('/users/all');
+        setUsersData(response.data.data);
       } catch (err) {
-        setError(err.message);
+        setError(err.response?.data?.detail || err.message || 'Failed to fetch user data');
       } finally {
         setIsLoading(false);
       }
