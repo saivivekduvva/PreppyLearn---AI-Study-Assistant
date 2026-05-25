@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { User, FileText, Loader2, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import apiClient from '../services/api';
+import { apiClient } from '../services/api';
 
 const ProfilePage = () => {
   const { user } = useContext(AuthContext);
