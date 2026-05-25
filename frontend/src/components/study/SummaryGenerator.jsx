@@ -3,12 +3,12 @@ import { generateSummary } from '../../services/api';
 import { Loader2, FileText, AlignLeft, BookOpen, FileCheck, RotateCcw } from 'lucide-react';
 
 const SummaryGenerator = ({ extractedText }) => {
-  const [summary, setSummary] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const [summaryType, setSummaryType] = useState('short');
+  const [summaries, setSummaries] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleGenerate = async (overrideType = null) => {
+  const handleGenerate = async () => {
     if (!extractedText) {
       setError("Please wait for text to be extracted from the document.");
       return;
@@ -17,14 +17,9 @@ const SummaryGenerator = ({ extractedText }) => {
     setIsLoading(true);
     setError('');
     
-    const typeToUse = overrideType || summaryType;
-    
     try {
-      const response = await generateSummary(extractedText, typeToUse);
-      setSummary(response.data.summary);
-      if (overrideType) {
-        setSummaryType(overrideType);
-      }
+      const response = await generateSummary(extractedText, summaryType);
+      setSummaries(prev => ({ ...prev, [summaryType]: response.data.summary }));
     } catch (err) {
       setError(err.message || "Failed to generate summary");
     } finally {
@@ -32,10 +27,7 @@ const SummaryGenerator = ({ extractedText }) => {
     }
   };
 
-  const handleInlineTypeChange = (newType) => {
-    if (newType === summaryType || isLoading) return;
-    handleGenerate(newType);
-  };
+  const hasAnySummary = Object.keys(summaries).length > 0;
 
   return (
     <div className="w-full h-full min-h-[500px] md:min-h-[600px] flex flex-col premium-card overflow-hidden bg-neutral-50">
@@ -54,7 +46,7 @@ const SummaryGenerator = ({ extractedText }) => {
       <div className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar flex flex-col h-full relative">
         
         {/* Empty State / Loading State / Initial Controls */}
-        {!summary ? (
+        {!hasAnySummary ? (
           <div className="flex-1 flex flex-col items-center justify-center animate-fadeIn">
             {isLoading ? (
               <div className="flex flex-col items-center gap-4 text-neutral-500">
@@ -96,11 +88,11 @@ const SummaryGenerator = ({ extractedText }) => {
                 </div>
 
                 <button 
-                  onClick={() => handleGenerate()}
+                  onClick={handleGenerate}
                   disabled={!extractedText || isLoading}
                   className="mt-8 w-full py-4 bg-neutral-900 hover:bg-black text-white font-bold rounded-xl transition-colors shadow-md disabled:opacity-50"
                 >
-                  Generate Now
+                  {isLoading ? 'Generating...' : 'Generate Now'}
                 </button>
                 {error && <p className="text-red-500 mt-4 text-sm font-semibold">{error}</p>}
               </div>
@@ -119,7 +111,7 @@ const SummaryGenerator = ({ extractedText }) => {
                 ].map((type) => (
                   <button
                     key={type.id}
-                    onClick={() => handleInlineTypeChange(type.id)}
+                    onClick={() => setSummaryType(type.id)}
                     disabled={isLoading}
                     className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap flex-1 text-center sm:flex-none ${
                       summaryType === type.id 
@@ -127,7 +119,7 @@ const SummaryGenerator = ({ extractedText }) => {
                       : 'text-neutral-600 hover:bg-neutral-100'
                     }`}
                   >
-                    {isLoading && summaryType === type.id ? 'Generating...' : type.label}
+                    {type.label}
                   </button>
                 ))}
               </div>
@@ -140,9 +132,30 @@ const SummaryGenerator = ({ extractedText }) => {
               <h4 className="text-lg sm:text-xl font-bold text-neutral-900 mb-4 sm:mb-6 tracking-tight capitalize border-b border-neutral-100 pb-3 sm:pb-4">
                 {summaryType} Summary
               </h4>
-              <div className="prose prose-neutral max-w-none text-neutral-700 leading-relaxed font-sans whitespace-pre-wrap text-sm sm:text-base">
-                {summary}
-              </div>
+              
+              {summaries[summaryType] ? (
+                <div className="prose prose-neutral max-w-none text-neutral-700 leading-relaxed font-sans whitespace-pre-wrap text-sm sm:text-base">
+                  {summaries[summaryType]}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <div className="w-16 h-16 bg-neutral-100 text-neutral-400 rounded-full flex items-center justify-center mb-4">
+                    <FileText size={32} />
+                  </div>
+                  <h5 className="text-lg font-bold text-neutral-900 mb-2">Not Generated Yet</h5>
+                  <p className="text-neutral-500 mb-6 max-w-xs text-sm">
+                    Click the button below to generate a {summaryType} summary.
+                  </p>
+                  <button 
+                    onClick={handleGenerate}
+                    disabled={isLoading}
+                    className="px-6 py-3 bg-neutral-900 hover:bg-black text-white font-semibold rounded-xl transition-colors shadow-md disabled:opacity-50 flex items-center gap-2"
+                  >
+                    {isLoading ? <Loader2 className="animate-spin" size={18} /> : <FileText size={18} />}
+                    {isLoading ? 'Generating...' : `Generate ${summaryType} Summary`}
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         )}
