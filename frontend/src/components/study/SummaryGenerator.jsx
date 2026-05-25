@@ -28,7 +28,7 @@ const SummaryGenerator = ({ extractedText }) => {
   };
 
   return (
-    <div className="w-full h-full min-h-[600px] flex flex-col premium-card overflow-hidden bg-neutral-50">
+    <div className="w-full h-full min-h-[500px] md:min-h-[600px] flex flex-col premium-card overflow-hidden bg-neutral-50">
       {/* Header */}
       <div className="px-8 py-6 bg-white border-b border-neutral-200 flex items-center gap-4 shrink-0">
         <div className="p-3 bg-neutral-100 rounded-xl text-neutral-900">
@@ -52,12 +52,12 @@ const SummaryGenerator = ({ extractedText }) => {
                 <p className="font-bold tracking-widest uppercase">Generating Summary...</p>
               </div>
             ) : (
-              <div className="w-full max-w-xl bg-white p-8 md:p-10 rounded-3xl shadow-xl border border-neutral-100 flex flex-col items-center text-center">
+              <div className="w-full max-w-xl bg-white p-6 md:p-10 rounded-3xl shadow-xl border border-neutral-100 flex flex-col items-center text-center">
                 <div className="w-16 h-16 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center mb-6 shadow-inner">
                   <FileText size={32} />
                 </div>
                 <h3 className="text-2xl font-bold text-neutral-900 mb-2 tracking-tight">Create a Summary</h3>
-                <p className="text-neutral-500 mb-8 max-w-sm">
+                <p className="text-neutral-500 mb-8 max-w-sm text-sm sm:text-base">
                   Condense your document into bite-sized knowledge. Choose a format below to get started.
                 </p>
 
@@ -70,7 +70,7 @@ const SummaryGenerator = ({ extractedText }) => {
                     <button
                       key={type.id}
                       onClick={() => setSummaryType(type.id)}
-                      className={`flex items-center justify-between p-4 rounded-xl border-2 transition-all font-semibold w-full ${
+                      className={`flex items-center justify-between p-3 sm:p-4 rounded-xl border-2 transition-all font-semibold w-full text-sm sm:text-base ${
                         summaryType === type.id 
                         ? 'border-neutral-900 bg-neutral-900 text-white shadow-md' 
                         : 'border-neutral-100 bg-neutral-50/50 text-neutral-600 hover:border-neutral-300 hover:bg-neutral-50'
@@ -100,7 +100,7 @@ const SummaryGenerator = ({ extractedText }) => {
           /* Results State */
           <div className="flex flex-col gap-6 animate-fadeIn w-full max-w-4xl mx-auto">
             {/* Inline Controls Header */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-white p-4 rounded-2xl border border-neutral-200 shadow-sm gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-white p-3 sm:p-4 rounded-2xl border border-neutral-200 shadow-sm gap-4">
               <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0 hide-scrollbar">
                 {[
                   { id: 'short', label: 'Brief' },
@@ -133,11 +133,11 @@ const SummaryGenerator = ({ extractedText }) => {
             {error && <p className="text-red-500 text-sm font-semibold text-center">{error}</p>}
 
             {/* Content Body */}
-            <div className={`bg-white p-8 rounded-3xl border border-neutral-200 shadow-sm transition-opacity duration-300 ${isLoading ? 'opacity-50' : 'opacity-100'}`}>
-              <h4 className="text-xl font-bold text-neutral-900 mb-6 tracking-tight capitalize border-b border-neutral-100 pb-4">
+            <div className={`bg-white p-5 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl border border-neutral-200 shadow-sm transition-opacity duration-300 ${isLoading ? 'opacity-50' : 'opacity-100'}`}>
+              <h4 className="text-lg sm:text-xl font-bold text-neutral-900 mb-4 sm:mb-6 tracking-tight capitalize border-b border-neutral-100 pb-3 sm:pb-4">
                 {summaryType} Summary
               </h4>
-              <div className="prose prose-neutral max-w-none text-neutral-700 leading-relaxed font-sans whitespace-pre-wrap">
+              <div className="prose prose-neutral max-w-none text-neutral-700 leading-relaxed font-sans whitespace-pre-wrap text-sm sm:text-base">
                 {summary}
               </div>
             </div>

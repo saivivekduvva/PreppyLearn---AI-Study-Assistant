@@ -45,7 +45,7 @@ const FlashcardGenerator = ({ extractedText }) => {
   };
 
   return (
-    <div className="w-full h-full min-h-[600px] flex flex-col premium-card overflow-hidden bg-neutral-50">
+    <div className="w-full h-full min-h-[500px] md:min-h-[600px] flex flex-col premium-card overflow-hidden bg-neutral-50">
       <div className="px-8 py-6 bg-white border-b border-neutral-200 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-4">
           <div className="p-3 bg-neutral-100 rounded-xl text-neutral-900">
@@ -70,12 +70,12 @@ const FlashcardGenerator = ({ extractedText }) => {
                 <p className="font-bold tracking-widest uppercase">Building your deck...</p>
               </div>
             ) : (
-              <div className="w-full max-w-xl bg-white p-8 md:p-10 rounded-3xl shadow-xl border border-neutral-100 flex flex-col items-center text-center">
+              <div className="w-full max-w-xl bg-white p-6 md:p-10 rounded-3xl shadow-xl border border-neutral-100 flex flex-col items-center text-center">
                 <div className="w-16 h-16 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center mb-6 shadow-inner">
                   <Layers size={32} />
                 </div>
                 <h3 className="text-2xl font-bold text-neutral-900 mb-2 tracking-tight">Create Flashcards</h3>
-                <p className="text-neutral-500 mb-8 max-w-sm">
+                <p className="text-neutral-500 mb-8 max-w-sm text-sm sm:text-base">
                   Automatically generate an interactive study deck based on the key concepts in your document.
                 </p>
                 
@@ -120,26 +120,26 @@ const FlashcardGenerator = ({ extractedText }) => {
               >
                 {/* Front (Question) */}
                 <div 
-                  className="absolute inset-0 w-full h-full bg-white border border-neutral-200 rounded-3xl p-8 flex flex-col justify-center items-center text-center shadow-sm backface-hidden"
+                  className="absolute inset-0 w-full h-full bg-white border border-neutral-200 rounded-2xl sm:rounded-3xl p-6 sm:p-8 flex flex-col justify-center items-center text-center shadow-sm backface-hidden"
                   style={{ backfaceVisibility: 'hidden' }}
                 >
-                  <span className="absolute top-6 left-6 text-xs font-bold text-blue-500 uppercase tracking-widest">Question</span>
-                  <h3 className="text-2xl font-bold text-neutral-900 leading-tight">
+                  <span className="absolute top-4 sm:top-6 left-4 sm:left-6 text-xs font-bold text-blue-500 uppercase tracking-widest">Question</span>
+                  <h3 className="text-xl sm:text-2xl font-bold text-neutral-900 leading-tight">
                     {flashcards[currentIndex].question}
                   </h3>
-                  <p className="absolute bottom-6 text-neutral-400 text-sm font-semibold tracking-wide">Click to reveal answer</p>
+                  <p className="absolute bottom-4 sm:bottom-6 text-neutral-400 text-xs sm:text-sm font-semibold tracking-wide">Click to reveal answer</p>
                 </div>
 
                 {/* Back (Answer) */}
                 <div 
-                  className="absolute inset-0 w-full h-full bg-neutral-900 border border-neutral-800 rounded-3xl p-8 flex flex-col justify-center items-center text-center shadow-sm backface-hidden"
+                  className="absolute inset-0 w-full h-full bg-neutral-900 border border-neutral-800 rounded-2xl sm:rounded-3xl p-6 sm:p-8 flex flex-col justify-center items-center text-center shadow-sm backface-hidden"
                   style={{ 
                     backfaceVisibility: 'hidden',
                     transform: 'rotateY(180deg)' 
                   }}
                 >
-                  <span className="absolute top-6 left-6 text-xs font-bold text-green-400 uppercase tracking-widest">Answer</span>
-                  <p className="text-xl font-medium text-white leading-relaxed">
+                  <span className="absolute top-4 sm:top-6 left-4 sm:left-6 text-xs font-bold text-green-400 uppercase tracking-widest">Answer</span>
+                  <p className="text-lg sm:text-xl font-medium text-white leading-relaxed">
                     {flashcards[currentIndex].answer}
                   </p>
                 </div>
@@ -151,14 +151,14 @@ const FlashcardGenerator = ({ extractedText }) => {
               <button 
                 onClick={handlePrev}
                 disabled={currentIndex === 0}
-                className="p-4 rounded-full bg-white border border-neutral-200 shadow-sm text-neutral-900 hover:bg-neutral-50 disabled:opacity-30 transition-all"
+                className="p-3 sm:p-4 rounded-full bg-white border border-neutral-200 shadow-sm text-neutral-900 hover:bg-neutral-50 disabled:opacity-30 transition-all"
               >
                 <ChevronLeft size={24} />
               </button>
               <button 
                 onClick={handleNext}
                 disabled={currentIndex === flashcards.length - 1}
-                className="p-4 rounded-full bg-white border border-neutral-200 shadow-sm text-neutral-900 hover:bg-neutral-50 disabled:opacity-30 transition-all"
+                className="p-3 sm:p-4 rounded-full bg-white border border-neutral-200 shadow-sm text-neutral-900 hover:bg-neutral-50 disabled:opacity-30 transition-all"
               >
                 <ChevronRight size={24} />
               </button>

@@ -56,7 +56,7 @@ const QuizGenerator = ({ extractedText }) => {
   };
 
   return (
-    <div className="w-full h-full min-h-[600px] flex flex-col premium-card overflow-hidden bg-neutral-50">
+    <div className="w-full h-full min-h-[500px] md:min-h-[600px] flex flex-col premium-card overflow-hidden bg-neutral-50">
       <div className="px-8 py-6 bg-white border-b border-neutral-200 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-4">
           <div className="p-3 bg-neutral-100 rounded-xl text-neutral-900">
@@ -80,12 +80,12 @@ const QuizGenerator = ({ extractedText }) => {
                 <p className="font-bold tracking-widest uppercase">Authoring Questions...</p>
               </div>
             ) : (
-              <div className="w-full max-w-xl bg-white p-8 md:p-10 rounded-3xl shadow-xl border border-neutral-100 flex flex-col items-center text-center">
+              <div className="w-full max-w-xl bg-white p-6 md:p-10 rounded-3xl shadow-xl border border-neutral-100 flex flex-col items-center text-center">
                 <div className="w-16 h-16 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center mb-6 shadow-inner">
                   <HelpCircle size={32} />
                 </div>
                 <h3 className="text-2xl font-bold text-neutral-900 mb-2 tracking-tight">Create a Quiz</h3>
-                <p className="text-neutral-500 mb-8 max-w-sm">
+                <p className="text-neutral-500 mb-8 max-w-sm text-sm sm:text-base">
                   Test your knowledge. We'll automatically generate multiple-choice questions based on your document.
                 </p>
                 
@@ -113,8 +113,8 @@ const QuizGenerator = ({ extractedText }) => {
                   </span>
                 </div>
 
-                <div className="bg-white p-8 rounded-3xl border border-neutral-200 shadow-sm mb-6">
-                  <h3 className="text-xl font-bold text-neutral-900 leading-relaxed">
+                <div className="bg-white p-6 sm:p-8 rounded-2xl sm:rounded-3xl border border-neutral-200 shadow-sm mb-6">
+                  <h3 className="text-lg sm:text-xl font-bold text-neutral-900 leading-relaxed">
                     {mcqs[currentIndex].question}
                   </h3>
                 </div>
@@ -145,9 +145,9 @@ const QuizGenerator = ({ extractedText }) => {
                         key={idx}
                         onClick={() => handleSelectOption(option)}
                         disabled={selectedAnswer !== null}
-                        className={`w-full text-left p-5 rounded-2xl border-2 transition-all flex justify-between items-center ${buttonClass}`}
+                        className={`w-full text-left p-4 sm:p-5 rounded-2xl border-2 transition-all flex justify-between items-center ${buttonClass}`}
                       >
-                        <span className="leading-relaxed">{option}</span>
+                        <span className="leading-relaxed text-sm sm:text-base">{option}</span>
                         {Icon}
                       </button>
                     );
@@ -168,8 +168,8 @@ const QuizGenerator = ({ extractedText }) => {
                 <div className="w-24 h-24 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center mb-6 shadow-inner">
                   <Trophy size={48} />
                 </div>
-                <h2 className="text-4xl font-bold text-neutral-900 mb-2 tracking-tight">Quiz Complete!</h2>
-                <p className="text-xl font-medium text-neutral-500 mb-8">
+                <h2 className="text-3xl sm:text-4xl font-bold text-neutral-900 mb-2 tracking-tight">Quiz Complete!</h2>
+                <p className="text-lg sm:text-xl font-medium text-neutral-500 mb-8">
                   You scored <span className="text-neutral-900 font-bold">{score}</span> out of <span className="text-neutral-900 font-bold">{mcqs.length}</span>
                 </p>
                 <button

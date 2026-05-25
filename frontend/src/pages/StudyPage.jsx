@@ -75,18 +75,18 @@ const StudyPage = () => {
   }
 
   return (
-    <div className="max-w-[1200px] mx-auto px-6 py-8">
-      <div className="flex items-center gap-4 mb-8">
+    <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-4 md:py-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-4 md:mb-8">
         <button 
           onClick={() => navigate('/document')}
-          className="p-2 hover:bg-neutral-100 rounded-full transition-colors text-neutral-500"
+          className="p-2 hover:bg-neutral-100 rounded-full transition-colors text-neutral-500 self-start sm:self-auto"
         >
           <ArrowLeft size={24} />
         </button>
-        <div>
-          <h1 className="text-3xl font-bold text-neutral-900 tracking-tight">Study Area</h1>
-          <p className="text-neutral-500 mt-1 flex items-center gap-2">
-            Currently studying: <span className="font-semibold text-neutral-700 bg-neutral-100 px-2 py-0.5 rounded text-sm">{uploadedFilename}</span>
+        <div className="flex-1 min-w-0">
+          <h1 className="text-2xl md:text-3xl font-bold text-neutral-900 tracking-tight">Study Area</h1>
+          <p className="text-neutral-500 mt-1 flex items-center gap-2 text-sm">
+            Currently studying: <span className="font-semibold text-neutral-700 bg-neutral-100 px-2 py-0.5 rounded truncate max-w-[200px] sm:max-w-xs">{uploadedFilename}</span>
           </p>
         </div>
       </div>
@@ -96,41 +96,41 @@ const StudyPage = () => {
         <div className="flex items-center border-b border-neutral-200 bg-white">
           <button
             onClick={() => setActiveTab('summary')}
-            className={`flex-1 flex items-center justify-center gap-2 py-4 px-6 text-sm font-semibold transition-all ${
+            className={`flex-1 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-3 sm:py-4 px-2 sm:px-6 text-xs sm:text-sm font-semibold transition-all ${
               activeTab === 'summary' 
                 ? 'text-neutral-900 border-b-2 border-neutral-900 bg-neutral-50/50' 
                 : 'text-neutral-500 hover:text-neutral-700 hover:bg-neutral-50'
             }`}
           >
-            <FileText size={18} />
-            Summary
+            <FileText size={18} className="shrink-0" />
+            <span>Summary</span>
           </button>
           <button
             onClick={() => setActiveTab('cards')}
-            className={`flex-1 flex items-center justify-center gap-2 py-4 px-6 text-sm font-semibold transition-all ${
+            className={`flex-1 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-3 sm:py-4 px-2 sm:px-6 text-xs sm:text-sm font-semibold transition-all ${
               activeTab === 'cards' 
                 ? 'text-neutral-900 border-b-2 border-neutral-900 bg-neutral-50/50' 
                 : 'text-neutral-500 hover:text-neutral-700 hover:bg-neutral-50'
             }`}
           >
-            <Layers size={18} />
-            Cards
+            <Layers size={18} className="shrink-0" />
+            <span>Cards</span>
           </button>
           <button
             onClick={() => setActiveTab('quiz')}
-            className={`flex-1 flex items-center justify-center gap-2 py-4 px-6 text-sm font-semibold transition-all ${
+            className={`flex-1 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-3 sm:py-4 px-2 sm:px-6 text-xs sm:text-sm font-semibold transition-all ${
               activeTab === 'quiz' 
                 ? 'text-neutral-900 border-b-2 border-neutral-900 bg-neutral-50/50' 
                 : 'text-neutral-500 hover:text-neutral-700 hover:bg-neutral-50'
             }`}
           >
-            <HelpCircle size={18} />
-            Quiz
+            <HelpCircle size={18} className="shrink-0" />
+            <span>Quiz</span>
           </button>
         </div>
 
         {/* Tab Content Area */}
-        <div className="bg-neutral-50/30 p-6 md:p-8 min-h-[600px]">
+        <div className="bg-neutral-50/30 p-4 sm:p-6 md:p-8 min-h-[500px] md:min-h-[600px]">
           {activeTab === 'summary' && (
             <div className="max-w-3xl mx-auto animate-fadeIn">
               <SummaryGenerator extractedText={extractedText} />
