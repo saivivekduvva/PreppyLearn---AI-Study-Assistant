@@ -38,18 +38,18 @@ const StudyPage = () => {
         <div className="absolute inset-0 bg-neutral-50/50 backdrop-blur-sm z-0"></div>
         
         {/* Floating Modal Window */}
-        <div className="z-10 w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-neutral-100 overflow-hidden animate-fadeIn transform transition-all">
-          <div className="p-8 text-center bg-gradient-to-b from-blue-50 to-white border-b border-neutral-100">
-            <div className="mx-auto w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-4 shadow-sm">
-              <BookOpen size={32} />
+        <div className="z-10 w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-neutral-100 overflow-hidden animate-fadeIn transform transition-all">
+          <div className="p-6 text-center bg-gradient-to-b from-blue-50 to-white border-b border-neutral-100">
+            <div className="mx-auto w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-3 shadow-sm">
+              <BookOpen size={24} />
             </div>
-            <h2 className="text-3xl font-bold text-neutral-900 tracking-tight mb-2">Select a Document</h2>
-            <p className="text-neutral-500 max-w-md mx-auto">
-              Choose a document from your library to start generating summaries, flashcards, and quizzes.
+            <h2 className="text-2xl font-bold text-neutral-900 tracking-tight mb-1">Select a Document</h2>
+            <p className="text-sm text-neutral-500 max-w-sm mx-auto">
+              Choose a document to start studying.
             </p>
           </div>
           
-          <div className="p-6 bg-neutral-50/30">
+          <div className="p-4 bg-neutral-50/30">
             {isDocumentLoading ? (
               <div className="flex flex-col items-center justify-center min-h-[300px]">
                 <Loader2 className="w-10 h-10 text-blue-500 animate-spin mb-4" />
@@ -57,14 +57,14 @@ const StudyPage = () => {
                 <p className="text-sm text-neutral-500 mt-1">Fetching your study materials</p>
               </div>
             ) : (
-              <DocumentLibrary onSelectDocument={handleSelectLibraryDocument} />
+              <DocumentLibrary onSelectDocument={handleSelectLibraryDocument} showDelete={false} />
             )}
           </div>
           
-          <div className="p-4 bg-white border-t border-neutral-100 text-center">
+          <div className="p-3 bg-white border-t border-neutral-100 text-center">
             <button 
               onClick={() => navigate('/document')}
-              className="text-sm text-neutral-500 hover:text-neutral-900 font-medium transition-colors"
+              className="text-xs text-neutral-500 hover:text-neutral-900 font-medium transition-colors"
             >
               Need to upload a new one? Go to Uploads
             </button>

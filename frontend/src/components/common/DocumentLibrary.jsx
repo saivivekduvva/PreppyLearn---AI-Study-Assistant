@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getLibraryDocuments, deleteDocument } from '../../services/api';
 import { BookMarked, FileText, Loader2, Clock, Trash2 } from 'lucide-react';
 
-const DocumentLibrary = ({ onSelectDocument }) => {
+const DocumentLibrary = ({ onSelectDocument, showDelete = true }) => {
   const [documents, setDocuments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -98,13 +98,13 @@ const DocumentLibrary = ({ onSelectDocument }) => {
               >
                 <button
                   onClick={() => onSelectDocument(doc.id, doc.filename)}
-                  className="flex-1 flex items-start gap-4 text-left"
+                  className="flex-1 flex items-start gap-4 text-left min-w-0"
                 >
-                  <div className="p-2 bg-neutral-100 text-neutral-400 rounded-lg group-hover:bg-blue-50 group-hover:text-blue-500 transition-colors">
+                  <div className="p-2 bg-neutral-100 text-neutral-400 rounded-lg group-hover:bg-blue-50 group-hover:text-blue-500 transition-colors shrink-0">
                     <FileText size={18} />
                   </div>
-                  <div className="flex flex-col flex-1 overflow-hidden">
-                    <span className="font-semibold text-neutral-900 truncate">{doc.filename}</span>
+                  <div className="flex flex-col flex-1 overflow-hidden min-w-0">
+                    <span className="font-semibold text-neutral-900 truncate block w-full">{doc.filename}</span>
                     <div className="flex items-center gap-1 text-xs text-neutral-500 mt-1 font-medium">
                       <Clock size={12} />
                       {new Date(doc.upload_date).toLocaleDateString()}
@@ -112,22 +112,24 @@ const DocumentLibrary = ({ onSelectDocument }) => {
                   </div>
                 </button>
                 
-                <button
-                  onClick={(e) => handleDelete(e, doc.id)}
-                  disabled={deletingId === doc.id}
-                  className={`p-2 rounded-lg transition-colors ml-2 flex-shrink-0 ${
-                    deletingId === doc.id 
-                      ? 'text-neutral-400 bg-neutral-100' 
-                      : 'text-neutral-400 hover:text-red-500 hover:bg-red-50'
-                  }`}
-                  title="Delete Document"
-                >
-                  {deletingId === doc.id ? (
-                    <Loader2 size={18} className="animate-spin" />
-                  ) : (
-                    <Trash2 size={18} />
-                  )}
-                </button>
+                {showDelete && (
+                  <button
+                    onClick={(e) => handleDelete(e, doc.id)}
+                    disabled={deletingId === doc.id}
+                    className={`p-2 rounded-lg transition-colors ml-2 flex-shrink-0 ${
+                      deletingId === doc.id 
+                        ? 'text-neutral-400 bg-neutral-100' 
+                        : 'text-neutral-400 hover:text-red-500 hover:bg-red-50'
+                    }`}
+                    title="Delete Document"
+                  >
+                    {deletingId === doc.id ? (
+                      <Loader2 size={18} className="animate-spin" />
+                    ) : (
+                      <Trash2 size={18} />
+                    )}
+                  </button>
+                )}
               </div>
             ))}
           </div>
