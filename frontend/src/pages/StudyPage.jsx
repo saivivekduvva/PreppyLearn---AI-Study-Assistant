@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SummaryGenerator from '../components/study/SummaryGenerator';
 import FlashcardGenerator from '../components/study/FlashcardGenerator';
 import QuizGenerator from '../components/study/QuizGenerator';
 import { useAppContext } from '../context/AppContext';
-import { FileText, Layers, HelpCircle, ArrowLeft, Lock, Loader2, BookOpen } from 'lucide-react';
+import { FileText, Layers, HelpCircle, ArrowLeft, Loader2, BookOpen } from 'lucide-react';
 import FloatingChatWidget from '../components/chat/FloatingChatWidget';
 import DocumentLibrary from '../components/common/DocumentLibrary';
 import { getDocumentText } from '../services/api';

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { generateSummary } from '../../services/api';
-import { Loader2, FileText, AlignLeft, BookOpen, FileCheck, RotateCcw } from 'lucide-react';
+import { Loader2, FileText, AlignLeft, BookOpen, FileCheck } from 'lucide-react';
 
 const SummaryGenerator = ({ extractedText }) => {
   const [summaryType, setSummaryType] = useState('short');

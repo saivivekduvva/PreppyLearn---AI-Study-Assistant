@@ -59,7 +59,7 @@ const useVectorProcessing = (extractedText, filename, shouldProcess) => {
     return () => {
       isMounted = false;
     };
-  }, [extractedText]);
+  }, [extractedText, filename, shouldProcess]);
 
   return { status, error };
 };

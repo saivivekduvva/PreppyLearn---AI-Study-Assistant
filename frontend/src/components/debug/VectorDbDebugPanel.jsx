@@ -11,11 +11,6 @@ const VectorDbDebugPanel = () => {
   const [loadingSearch, setLoadingSearch] = useState(false);
   const [searchError, setSearchError] = useState(null);
 
-  // Fetch count on mount
-  useEffect(() => {
-    fetchCount();
-  }, []);
-
   const fetchCount = async () => {
     setLoadingCount(true);
     setCountError(null);
@@ -30,6 +25,12 @@ const VectorDbDebugPanel = () => {
       setLoadingCount(false);
     }
   };
+
+  // Fetch count on mount
+  useEffect(() => {
+    fetchCount();
+  }, []);
+
 
   const handleSearch = async (e) => {
     e.preventDefault();

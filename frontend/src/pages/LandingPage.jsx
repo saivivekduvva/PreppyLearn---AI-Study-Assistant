@@ -1,6 +1,5 @@
 import React, { useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import DocumentUploader from '../components/common/DocumentUploader';
 import { useAppContext } from '../context/AppContext';
 import { AuthContext } from '../context/AuthContext';
 import { ArrowRight } from 'lucide-react';
@@ -9,12 +8,6 @@ const LandingPage = () => {
   const navigate = useNavigate();
   const { setUploadedFilename, setExtractedText } = useAppContext();
   const { user } = useContext(AuthContext);
-
-  const handleUploadSuccess = (filename) => {
-    setUploadedFilename(filename);
-    setExtractedText(null); // Reset text until extracted
-    navigate('/document'); // Navigate to the processing page
-  };
 
   return (
     <div className="w-full flex flex-col items-center justify-center min-h-[80vh] px-4">

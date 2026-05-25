@@ -9,7 +9,7 @@ const AdvancedDebugPage = () => {
   const [extractedText, setExtractedText] = useState(null);
   const [isLibraryLoading, setIsLibraryLoading] = useState(false);
 
-  const handleSelectLibraryDocument = async (id, filename) => {
+  const handleSelectLibraryDocument = async (id) => {
     try {
       setIsLibraryLoading(true);
       setExtractedText(null); // Reset

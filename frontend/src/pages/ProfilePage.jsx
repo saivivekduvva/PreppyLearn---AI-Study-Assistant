@@ -18,8 +18,8 @@ const ProfilePage = () => {
         const response = await apiClient.get('/users/me');
         if (response.data?.status === 'success') {
           setProfileData(response.data.data);
-        }
       } catch (err) {
+        console.error("Profile fetch error:", err);
         setError('Failed to load profile data.');
       } finally {
         setIsLoading(false);
