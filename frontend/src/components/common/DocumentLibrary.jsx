@@ -8,16 +8,27 @@ const DocumentLibrary = ({ onSelectDocument }) => {
   const [error, setError] = useState('');
   const [deletingId, setDeletingId] = useState(null);
 
+  const [isSlowLoading, setIsSlowLoading] = useState(false);
+
   const fetchDocs = async () => {
+    setIsLoading(true);
+    setError('');
+    // Trigger slow loading message if it takes more than 5 seconds
+    const slowLoadingTimer = setTimeout(() => {
+      setIsSlowLoading(true);
+    }, 5000);
+
     try {
       const response = await getLibraryDocuments();
       if (response.status === 'success') {
         setDocuments(response.data);
       }
     } catch (err) {
-      setError('Failed to load library');
+      setError('Failed to connect to the backend. Please try refreshing the page.');
     } finally {
+      clearTimeout(slowLoadingTimer);
       setIsLoading(false);
+      setIsSlowLoading(false);
     }
   };
 
@@ -43,8 +54,13 @@ const DocumentLibrary = ({ onSelectDocument }) => {
   if (isLoading) {
     return (
       <div className="w-full premium-card p-6 flex flex-col items-center justify-center min-h-[200px]">
-        <Loader2 className="animate-spin text-neutral-400 mb-2" size={24} />
-        <p className="text-sm text-neutral-500 font-medium">Loading Library...</p>
+        <Loader2 className="animate-spin text-neutral-400 mb-4" size={24} />
+        <p className="text-sm text-neutral-600 font-medium mb-1">Loading Library...</p>
+        {isSlowLoading && (
+          <p className="text-xs text-blue-500 animate-pulse text-center max-w-xs mt-2">
+            Waking up the server.<br/>This can take up to 60 seconds on the free tier.
+          </p>
+        )}
       </div>
     );
   }
@@ -59,7 +75,17 @@ const DocumentLibrary = ({ onSelectDocument }) => {
       </div>
       
       <div className="flex-1 overflow-y-auto max-h-[400px] custom-scrollbar bg-neutral-50/50">
-        {documents.length === 0 ? (
+        {error ? (
+          <div className="p-8 flex flex-col items-center justify-center text-center">
+            <p className="text-red-500 font-medium text-sm mb-4">{error}</p>
+            <button 
+              onClick={fetchDocs}
+              className="px-4 py-2 bg-neutral-900 text-white rounded-lg text-sm hover:bg-neutral-800 transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        ) : documents.length === 0 ? (
           <div className="p-8 text-center text-neutral-500 text-sm">
             No previous documents found.
           </div>
