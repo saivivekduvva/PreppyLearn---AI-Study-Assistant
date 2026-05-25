@@ -1,14 +1,32 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { GraduationCap, User, LogOut, Menu, X } from 'lucide-react';
+import { GraduationCap, User, LogOut, Menu, X, Wifi, WifiOff } from 'lucide-react';
 import { useAppContext } from '../../context/AppContext';
 import { AuthContext } from '../../context/AuthContext';
+import { checkHealth } from '../../services/api';
 
 const Header = () => {
   const location = useLocation();
   const { uploadedFilename } = useAppContext();
   const { user, logout } = useContext(AuthContext);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isConnected, setIsConnected] = useState(true);
+
+  useEffect(() => {
+    const verifyConnection = async () => {
+      try {
+        await checkHealth();
+        setIsConnected(true);
+      } catch (error) {
+        setIsConnected(false);
+      }
+    };
+    
+    verifyConnection();
+    const intervalId = setInterval(verifyConnection, 30000); // Check every 30 seconds
+    
+    return () => clearInterval(intervalId);
+  }, []);
 
   const isActive = (path) => {
     return location.pathname === path ? "text-neutral-900 font-semibold" : "text-neutral-500 hover:text-neutral-900";
@@ -50,8 +68,16 @@ const Header = () => {
 
         {/* Action Buttons (Right) */}
         <div className="flex items-center gap-4">
-          <span className="text-xs font-medium px-2 py-1 bg-green-50 text-green-700 rounded-md border border-green-200 hidden sm:inline-block">
-            Connected
+          <span className={`text-xs font-medium px-2 py-1 rounded-md border hidden sm:flex items-center gap-1.5 transition-colors ${
+            isConnected 
+              ? 'bg-green-50 text-green-700 border-green-200' 
+              : 'bg-red-50 text-red-700 border-red-200'
+          }`}>
+            {isConnected ? (
+              <><Wifi size={12} /> Connected</>
+            ) : (
+              <><WifiOff size={12} /> Offline</>
+            )}
           </span>
           {user ? (
             <div className="flex items-center gap-4">
@@ -127,3 +153,4 @@ const Header = () => {
 };
 
 export default Header;
+

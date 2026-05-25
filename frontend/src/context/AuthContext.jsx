@@ -30,13 +30,29 @@ export const AuthProvider = ({ children }) => {
                 }
             );
 
-            setUser({ loggedIn: true }); // simplified
+            // Fetch actual user data instead of simplified object
+            apiClient.get('/users/me')
+                .then(response => {
+                    if (response.data?.status === 'success') {
+                        setUser({ 
+                            username: response.data.data.username,
+                            id: response.data.data.id,
+                            loggedIn: true 
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error("Failed to fetch user data on load:", error);
+                    setUser({ loggedIn: true }); // fallback
+                })
+                .finally(() => {
+                    setIsLoading(false);
+                });
         } else {
             setUser(null);
+            setIsLoading(false);
         }
         
-        setIsLoading(false);
-
         return () => {
             if (requestInterceptor) apiClient.interceptors.request.eject(requestInterceptor);
             if (responseInterceptor) apiClient.interceptors.response.eject(responseInterceptor);
