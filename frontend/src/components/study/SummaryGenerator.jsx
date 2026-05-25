@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { generateSummary } from '../../services/api';
-import { Loader2, FileText, AlignLeft, BookOpen, FileCheck } from 'lucide-react';
+import { Loader2, FileText, AlignLeft, BookOpen, FileCheck, RotateCcw } from 'lucide-react';
 
 const SummaryGenerator = ({ extractedText }) => {
   const [summary, setSummary] = useState('');
@@ -41,61 +41,108 @@ const SummaryGenerator = ({ extractedText }) => {
       </div>
 
       {/* Content Area */}
-      <div className="flex-1 overflow-y-auto p-8 custom-scrollbar flex flex-col gap-6">
+      <div className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar flex flex-col h-full relative">
         
-        {/* Controls */}
-        <div className="bg-white p-6 rounded-3xl border border-neutral-200 shadow-sm flex flex-col gap-4">
-          <label className="text-sm font-bold text-neutral-900 uppercase tracking-widest">Select Summary Type</label>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {[
-              { id: 'short', label: 'Brief Summary', icon: <AlignLeft size={16}/> },
-              { id: 'detailed', label: 'Detailed Notes', icon: <BookOpen size={16}/> },
-              { id: 'exam', label: 'Exam Revision', icon: <FileCheck size={16}/> }
-            ].map((type) => (
-              <button
-                key={type.id}
-                onClick={() => setSummaryType(type.id)}
-                className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl border transition-all text-sm font-semibold ${
-                  summaryType === type.id 
-                  ? 'bg-neutral-900 text-white border-neutral-900 shadow-md' 
-                  : 'bg-white text-neutral-600 border-neutral-200 hover:border-neutral-400 hover:bg-neutral-50'
-                }`}
-              >
-                {type.icon}
-                {type.label}
-              </button>
-            ))}
+        {/* Empty State / Loading State / Initial Controls */}
+        {!summary ? (
+          <div className="flex-1 flex flex-col items-center justify-center animate-fadeIn">
+            {isLoading ? (
+              <div className="flex flex-col items-center gap-4 text-neutral-500">
+                <Loader2 className="animate-spin text-neutral-900" size={48} />
+                <p className="font-bold tracking-widest uppercase">Generating Summary...</p>
+              </div>
+            ) : (
+              <div className="w-full max-w-xl bg-white p-8 md:p-10 rounded-3xl shadow-xl border border-neutral-100 flex flex-col items-center text-center">
+                <div className="w-16 h-16 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center mb-6 shadow-inner">
+                  <FileText size={32} />
+                </div>
+                <h3 className="text-2xl font-bold text-neutral-900 mb-2 tracking-tight">Create a Summary</h3>
+                <p className="text-neutral-500 mb-8 max-w-sm">
+                  Condense your document into bite-sized knowledge. Choose a format below to get started.
+                </p>
+
+                <div className="w-full flex flex-col gap-3">
+                  {[
+                    { id: 'short', label: 'Brief Summary', icon: <AlignLeft size={18}/> },
+                    { id: 'detailed', label: 'Detailed Notes', icon: <BookOpen size={18}/> },
+                    { id: 'exam', label: 'Exam Revision', icon: <FileCheck size={18}/> }
+                  ].map((type) => (
+                    <button
+                      key={type.id}
+                      onClick={() => setSummaryType(type.id)}
+                      className={`flex items-center justify-between p-4 rounded-xl border-2 transition-all font-semibold w-full ${
+                        summaryType === type.id 
+                        ? 'border-neutral-900 bg-neutral-900 text-white shadow-md' 
+                        : 'border-neutral-100 bg-neutral-50/50 text-neutral-600 hover:border-neutral-300 hover:bg-neutral-50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        {type.icon}
+                        <span>{type.label}</span>
+                      </div>
+                      {summaryType === type.id && <div className="w-2 h-2 rounded-full bg-white"></div>}
+                    </button>
+                  ))}
+                </div>
+
+                <button 
+                  onClick={handleGenerate}
+                  disabled={!extractedText}
+                  className="mt-8 w-full py-4 bg-neutral-900 hover:bg-black text-white font-bold rounded-xl transition-colors shadow-md disabled:opacity-50"
+                >
+                  Generate Now
+                </button>
+                {error && <p className="text-red-500 mt-4 text-sm font-semibold">{error}</p>}
+              </div>
+            )}
           </div>
+        ) : (
+          /* Results State */
+          <div className="flex flex-col gap-6 animate-fadeIn w-full max-w-4xl mx-auto">
+            {/* Inline Controls Header */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-white p-4 rounded-2xl border border-neutral-200 shadow-sm gap-4">
+              <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0 hide-scrollbar">
+                {[
+                  { id: 'short', label: 'Brief' },
+                  { id: 'detailed', label: 'Detailed' },
+                  { id: 'exam', label: 'Exam' }
+                ].map((type) => (
+                  <button
+                    key={type.id}
+                    onClick={() => setSummaryType(type.id)}
+                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap ${
+                      summaryType === type.id 
+                      ? 'bg-neutral-100 text-neutral-900' 
+                      : 'text-neutral-500 hover:bg-neutral-50'
+                    }`}
+                  >
+                    {type.label}
+                  </button>
+                ))}
+              </div>
+              <button 
+                onClick={handleGenerate}
+                disabled={isLoading}
+                className="w-full sm:w-auto px-6 py-2 bg-neutral-900 hover:bg-black text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
+              >
+                {isLoading ? <Loader2 className="animate-spin" size={16} /> : <RotateCcw size={16} />}
+                {isLoading ? 'Generating...' : 'Regenerate'}
+              </button>
+            </div>
+            
+            {error && <p className="text-red-500 text-sm font-semibold text-center">{error}</p>}
 
-          <button 
-            onClick={handleGenerate}
-            disabled={isLoading || !extractedText}
-            className="mt-2 w-full py-4 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isLoading ? <Loader2 className="animate-spin" size={20} /> : <FileText size={20} />}
-            {isLoading ? 'Generating...' : 'Generate Summary'}
-          </button>
-          
-          {error && <p className="text-red-500 text-sm font-semibold text-center">{error}</p>}
-        </div>
-
-        {/* Results */}
-        {summary && (
-          <div className="bg-white p-8 rounded-3xl border border-neutral-200 shadow-sm">
-            <h4 className="text-lg font-bold text-neutral-900 mb-4 tracking-tight capitalize">{summaryType} Summary</h4>
-            <div className="prose prose-neutral max-w-none text-neutral-700 leading-relaxed font-sans whitespace-pre-wrap">
-              {summary}
+            {/* Content Body */}
+            <div className={`bg-white p-8 rounded-3xl border border-neutral-200 shadow-sm transition-opacity duration-300 ${isLoading ? 'opacity-50' : 'opacity-100'}`}>
+              <h4 className="text-xl font-bold text-neutral-900 mb-6 tracking-tight capitalize border-b border-neutral-100 pb-4">
+                {summaryType} Summary
+              </h4>
+              <div className="prose prose-neutral max-w-none text-neutral-700 leading-relaxed font-sans whitespace-pre-wrap">
+                {summary}
+              </div>
             </div>
           </div>
         )}
-
-        {!summary && !isLoading && (
-          <div className="flex-1 flex flex-col items-center justify-center text-neutral-400 opacity-50 py-12">
-            <FileText size={48} className="mb-4" />
-            <p className="font-semibold">Generate a summary to see it here.</p>
-          </div>
-        )}
-
       </div>
     </div>
   );

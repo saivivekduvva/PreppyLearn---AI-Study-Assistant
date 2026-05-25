@@ -56,31 +56,42 @@ const FlashcardGenerator = ({ extractedText }) => {
             <p className="text-sm font-semibold text-neutral-500">AI-Generated Deck</p>
           </div>
         </div>
-        
-        {flashcards.length === 0 && (
-          <button 
-            onClick={handleGenerate}
-            disabled={isLoading || !extractedText}
-            className="py-3 px-6 bg-neutral-900 hover:bg-black text-white font-bold rounded-xl transition-colors flex items-center gap-2 shadow-md disabled:opacity-50"
-          >
-            {isLoading ? <Loader2 className="animate-spin" size={18} /> : <Layers size={18} />}
-            Generate Deck
-          </button>
-        )}
       </div>
 
-      <div className="flex-1 overflow-y-auto p-8 flex flex-col items-center justify-center">
-        {error && <p className="text-red-500 mb-4 font-semibold">{error}</p>}
+      {/* Content Area */}
+      <div className="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col items-center justify-center relative">
+        {error && <p className="absolute top-4 text-red-500 font-semibold">{error}</p>}
 
-        {isLoading && (
-          <div className="flex flex-col items-center gap-4 text-neutral-500">
-            <Loader2 className="animate-spin text-neutral-900" size={48} />
-            <p className="font-bold tracking-widest uppercase">Building your deck...</p>
+        {flashcards.length === 0 ? (
+          <div className="flex-1 flex flex-col items-center justify-center animate-fadeIn w-full">
+            {isLoading ? (
+              <div className="flex flex-col items-center gap-4 text-neutral-500">
+                <Loader2 className="animate-spin text-neutral-900" size={48} />
+                <p className="font-bold tracking-widest uppercase">Building your deck...</p>
+              </div>
+            ) : (
+              <div className="w-full max-w-xl bg-white p-8 md:p-10 rounded-3xl shadow-xl border border-neutral-100 flex flex-col items-center text-center">
+                <div className="w-16 h-16 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center mb-6 shadow-inner">
+                  <Layers size={32} />
+                </div>
+                <h3 className="text-2xl font-bold text-neutral-900 mb-2 tracking-tight">Create Flashcards</h3>
+                <p className="text-neutral-500 mb-8 max-w-sm">
+                  Automatically generate an interactive study deck based on the key concepts in your document.
+                </p>
+                
+                <button 
+                  onClick={handleGenerate}
+                  disabled={!extractedText}
+                  className="w-full py-4 bg-neutral-900 hover:bg-black text-white font-bold rounded-xl transition-colors shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  <Layers size={20} />
+                  Generate Deck
+                </button>
+              </div>
+            )}
           </div>
-        )}
-
-        {!isLoading && flashcards.length > 0 && (
-          <div className="w-full max-w-lg flex flex-col items-center gap-8">
+        ) : (
+          <div className={`w-full max-w-lg flex flex-col items-center gap-8 animate-fadeIn transition-opacity duration-300 ${isLoading ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
             
             <div className="flex items-center justify-between w-full text-neutral-500 font-bold uppercase tracking-widest text-sm">
               <span>Card {currentIndex + 1} of {flashcards.length}</span>
@@ -89,7 +100,8 @@ const FlashcardGenerator = ({ extractedText }) => {
                 className="flex items-center gap-1 hover:text-neutral-900 transition-colors"
                 title="Regenerate Deck"
               >
-                <RotateCcw size={14} /> New Deck
+                {isLoading ? <Loader2 className="animate-spin" size={14} /> : <RotateCcw size={14} />} 
+                New Deck
               </button>
             </div>
 
@@ -154,15 +166,6 @@ const FlashcardGenerator = ({ extractedText }) => {
 
           </div>
         )}
-
-        {!isLoading && flashcards.length === 0 && !error && (
-          <div className="flex flex-col items-center justify-center text-neutral-400 opacity-50">
-            <Layers size={64} className="mb-4" />
-            <p className="font-bold text-lg">Your deck is empty.</p>
-            <p>Click generate to create flashcards from your text.</p>
-          </div>
-        )}
-
       </div>
     </div>
   );
